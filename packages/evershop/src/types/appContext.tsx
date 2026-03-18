@@ -1,5 +1,11 @@
 import { PageMetaInfo } from './pageMeta.js';
 
+type GraphqlScalar = string | number | boolean | null;
+type GraphqlResponseValue =
+  | GraphqlScalar
+  | GraphqlResponseValue[]
+  | { [key: string]: GraphqlResponseValue };
+
 interface Config {
   pageMeta: PageMetaInfo;
   tax: {
@@ -11,12 +17,15 @@ interface Config {
 }
 
 interface AppStateContextValue {
-  graphqlResponse: {
-    [key: string]: any;
-  };
+  graphqlResponse: Record<string, GraphqlResponseValue>;
   config: Config;
   propsMap: Record<string, any[]>;
-  widgets?: any[];
+  widgets?: {
+    areaId: string[];
+    id: string;
+    type: string;
+    sortOrder: number;
+  }[];
   fetching: boolean;
 }
 

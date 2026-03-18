@@ -23,7 +23,8 @@ export type AttributeData = {
   is_required: boolean;
   display_on_frontend?: boolean;
   groups: number[];
-  [key: string]: any;
+  options?: { option_text: string, option_id: string | number }[];
+  [key: string]: unknown;
 };
 
 function validateAttributeDataBeforeInsert(data: AttributeData) {

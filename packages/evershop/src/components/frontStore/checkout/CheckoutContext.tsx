@@ -3,6 +3,7 @@ import {
   useCartDispatch
 } from '@components/frontStore/cart/CartContext.js';
 import { _ } from '@evershop/evershop/lib/locale/translate/_';
+import { CreateOrderResult } from '@evershop/evershop/checkout/services';
 import { CheckoutData } from '@evershop/evershop/types/checkoutData';
 import { produce } from 'immer';
 import React, {
@@ -13,12 +14,12 @@ import React, {
   useCallback,
   useMemo
 } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, FieldValues } from 'react-hook-form';
 
 interface PaymentMethod {
   code: string;
   name: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface PaymentMethodRendererProps {
@@ -38,7 +39,7 @@ interface ShippingMethod {
     value: number;
     text: string;
   };
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface ShippingAddressParams {
@@ -119,12 +120,14 @@ interface CheckoutContextValue extends CheckoutState {
   checkoutSuccessUrl: string;
   loading: boolean; // Computed from loadingStates
   requiresShipment: boolean; // Computed from cart items
-  form: UseFormReturn<any>; // React Hook Form instance
+  form: UseFormReturn<FieldValues>; // React Hook Form instance
 }
 
-interface CheckoutDispatchContextValue {
-  placeOrder: () => Promise<any>;
-  checkout: () => Promise<any>;
+interface CheckoutDispatchContextValue<
+  T extends CreateOrderResult = CreateOrderResult
+> {
+  placeOrder: () => Promise<T>;
+  checkout: () => Promise<T>;
   getPaymentMethods: () => PaymentMethod[];
   getShippingMethods: (
     params?: ShippingAddressParams
@@ -156,7 +159,7 @@ interface CheckoutProviderProps {
   placeOrderApi: string;
   checkoutSuccessUrl: string;
   allowGuestCheckout?: boolean; // Optional, defaults to false
-  form: UseFormReturn<any>; // React Hook Form instance passed from outside
+  form: UseFormReturn<FieldValues>; // React Hook Form instance passed from outside
   enableForm: () => void;
   disableForm: () => void;
 }
@@ -404,14 +407,16 @@ export const useCheckout = (): CheckoutContextValue => {
   return context;
 };
 
-export const useCheckoutDispatch = (): CheckoutDispatchContextValue => {
+export const useCheckoutDispatch = <
+  T extends CreateOrderResult = CreateOrderResult
+>(): CheckoutDispatchContextValue<T> => {
   const context = useContext(CheckoutDispatchContext);
   if (context === undefined) {
     throw new Error(
       'useCheckoutDispatch must be used within a CheckoutProvider'
     );
   }
-  return context;
+  return context as CheckoutDispatchContextValue<T>;
 };
 
 export type {

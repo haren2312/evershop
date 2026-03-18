@@ -53,7 +53,7 @@ export interface SearchResult {
   image?: string;
   price?: string;
   type?: 'product' | 'category' | 'page';
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface SearchBoxProps {

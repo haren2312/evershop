@@ -14,7 +14,7 @@ import CreatableSelect, { CreatableProps } from 'react-select/creatable';
 interface SelectOption {
   value: any;
   label: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface ReactSelectCreatableFieldProps<T extends FieldValues = FieldValues>

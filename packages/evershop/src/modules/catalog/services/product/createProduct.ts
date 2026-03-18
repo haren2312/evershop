@@ -19,6 +19,7 @@ import {
 import { sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import productDataSchema from './productDataSchema.json'  with { type: 'json' };
+import { Row } from '@components/common/form/Editor.js';
 
 export type ProductData = ProductInventoryData & {
   name: string,
@@ -30,20 +31,21 @@ export type ProductData = ProductInventoryData & {
   visibility?: string,
   attributes?: ProductAttributeData[],
   images?: string[],
-  [key: string]: any
+  description?: Row[],
+  [key: string]: unknown;
 };
 
 export type ProductInventoryData = {
   qty: number,
   manage_stock: boolean,
   stock_availability: boolean,
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type ProductAttributeData = {
   attribute_code: string,
   value: string,
-  [key: string]: any
+  [key: string]: unknown
 }
 
 function validateProductDataBeforeInsert(data: ProductData) {

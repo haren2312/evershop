@@ -20,7 +20,7 @@ export type AttributeData = {
   type?: string;
   groups: number[];
   options: { option_text: string, option_id: string | number }[];
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 function validateAttributeDataBeforeInsert(data: AttributeData) {

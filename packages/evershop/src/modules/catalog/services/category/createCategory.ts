@@ -16,11 +16,13 @@ import {
 import { sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import categoryDataSchema from './categoryDataSchema.json' with { type: 'json' };
+import { Row } from '@components/common/form/Editor.js';
 
 export type CategoryData = {
   name: string;
   url_key: string;
-  [key: string]: any;
+  description?: Row[];
+  [key: string]: unknown;
 };
 
 function validateCategoryDataBeforeInsert(data: CategoryData) {

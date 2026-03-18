@@ -31,30 +31,30 @@ type ConfigStructure = {
       order_confirmation?: {
         enabled: boolean;
         templatePath?: string | null;
-        [key: string]: any;
+        [key: string]: unknown;
       };
       customer_welcome?: {
         enabled: boolean;
         templatePath?: string | null;
-        [key: string]: any;
+        [key: string]: unknown;
       };
       reset_password?: {
         enabled: boolean;
         templatePath?: string | null;
-        [key: string]: any;
+        [key: string]: unknown;
       };
     };
     stripe?: {
       secretKey?: string;
       publishableKey?: string;
-      [key: string]: any;
+      [key: string]: unknown;
     };
     paypal?: {
-      [key: string]: any;
+      [key: string]: unknown;
     };
     cod?: {
       status?: number;
-      [key: string]: any;
+      [key: string]: unknown;
     };
   };
   catalog: {

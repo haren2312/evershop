@@ -48,7 +48,7 @@ export type SendEmailArguments = {
   body?: string;
   template: string;
   data: EmailData;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 /**
@@ -211,7 +211,7 @@ export interface EmailData {
       postalCode?: string;
     };
   };
-  [key: string]: any;
+  [key: string]: unknown;
 }
 /**
  * Builds email body from a template by replacing placeholders with actual data.

@@ -8,12 +8,13 @@ import type { PoolClient } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
 import { hookable } from '../../../../lib/util/hookable.js';
 import { getValue } from '../../../../lib/util/registry.js';
-import { sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
+import { Row, sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
 
 export type CollectionData = {
   name: string;
   code: string;
-  [key: string]: any;
+  description?: Row[];
+  [key: string]: unknown;
 };
 
 async function insertCollectionData(

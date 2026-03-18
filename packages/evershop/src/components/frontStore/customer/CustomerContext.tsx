@@ -203,7 +203,7 @@ interface Customer {
     value: string;
     text: string;
   };
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface CustomerState {
@@ -249,7 +249,7 @@ interface CustomerDispatchContextValue {
     data: {
       email: string;
       password: string;
-      [key: string]: any;
+      [key: string]: unknown;
     },
     redirectUrl: string
   ) => Promise<boolean>;
@@ -258,7 +258,7 @@ interface CustomerDispatchContextValue {
       full_name: string;
       email: string;
       password: string;
-      [key: string]: any;
+      [key: string]: unknown;
     },
     loginIfSuccess: boolean,
     redirectUrl: string
@@ -344,7 +344,7 @@ export function CustomerProvider({
       data: {
         email: string;
         password: string;
-        [key: string]: any;
+        [key: string]: unknown;
       },
       redirectUrl: string
     ): Promise<boolean> => {
@@ -385,7 +385,7 @@ export function CustomerProvider({
         full_name: string;
         email: string;
         password: string;
-        [key: string]: any;
+        [key: string]: unknown;
       },
       loginIfSuccess: boolean,
       redirectUrl: string

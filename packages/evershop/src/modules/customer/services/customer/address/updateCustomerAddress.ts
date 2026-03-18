@@ -23,7 +23,7 @@ async function updateCustomerAddressData(
     const newAddress = (await update('customer_address')
       .given(data)
       .where('uuid', '=', uuid)
-      .execute(connection)) as Address;
+      .execute(connection)) as unknown as Address;
     if (newAddress.is_default) {
       await update('customer_address')
         .given({

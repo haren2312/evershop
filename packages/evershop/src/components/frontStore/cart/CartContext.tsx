@@ -119,7 +119,7 @@ export interface CartItem {
   variantGroupId?: number;
   removeApi: string; // API endpoint to remove item from cart
   updateQtyApi: string; // API endpoint to update item quantity
-  errors?: any[]; // Validation errors for this item
+  errors?: string[]; // Validation errors for this item
 }
 
 export interface PaymentMethod {
@@ -252,7 +252,7 @@ export interface CartData {
   // Errors
   errors: CartError[];
   error: string | null;
-  [extendedFields: string]: any; // Allow third-party extensions to add fields
+  [extendedFields: string]: unknown; // Allow third-party extensions to add fields
 }
 
 // Complete cart state with detailed loading states

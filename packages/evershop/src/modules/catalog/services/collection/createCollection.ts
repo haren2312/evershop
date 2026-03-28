@@ -6,7 +6,7 @@ import {
 } from '@evershop/postgres-query-builder';
 import type { PoolClient } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import { getValue } from '../../../../lib/util/registry.js';
 import { Row, sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
 
@@ -75,3 +75,55 @@ export default async (data: CollectionData, context: Record<string, any>) => {
   const collection = await hookable(createCollection)(data, context);
   return collection;
 };
+
+export function hookBeforeInsertCollectionData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: CollectionData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertCollectionData', callback, priority);
+}
+
+export function hookAfterInsertCollectionData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: CollectionData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertCollectionData', callback, priority);
+}
+
+export function hookBeforeCreateCollection(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: CollectionData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('createCollection', callback, priority);
+}
+
+export function hookAfterCreateCollection(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: CollectionData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('createCollection', callback, priority);
+}

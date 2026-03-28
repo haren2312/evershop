@@ -6,7 +6,7 @@ import {
   startTransaction
 } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 
 async function deletePageData(uuid, connection) {
   await del('cms_page').where('uuid', '=', uuid).execute(connection);
@@ -53,3 +53,55 @@ export default async (uuid, context) => {
   const page = await hookable(deletePage, context)(uuid, context);
   return page;
 };
+
+export function hookBeforeDeletePageData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: any,
+    connection: any
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('deletePageData', callback, priority);
+}
+
+export function hookAfterDeletePageData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: any,
+    connection: any
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('deletePageData', callback, priority);
+}
+
+export function hookBeforeDeletePage(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: any,
+    context: any
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('deletePage', callback, priority);
+}
+
+export function hookAfterDeletePage(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: any,
+    context: any
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('deletePage', callback, priority);
+}

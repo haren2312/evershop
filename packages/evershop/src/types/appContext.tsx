@@ -1,3 +1,4 @@
+import { WidgetInstance } from '@evershop/evershop/types/widget';
 import { PageMetaInfo } from './pageMeta.js';
 
 type GraphqlScalar = string | number | boolean | null;
@@ -20,12 +21,7 @@ interface AppStateContextValue {
   graphqlResponse: Record<string, GraphqlResponseValue>;
   config: Config;
   propsMap: Record<string, any[]>;
-  widgets?: {
-    areaId: string[];
-    id: string;
-    type: string;
-    sortOrder: number;
-  }[];
+  widgets?: WidgetInstance[];
   fetching: boolean;
 }
 

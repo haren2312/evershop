@@ -5,7 +5,7 @@ import {
   startTransaction
 } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
@@ -84,3 +84,55 @@ export default async (data, context) => {
   const page = await hookable(createPage, context)(data, context);
   return page;
 };
+
+export function hookBeforeInsertPageData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: any,
+    connection: any
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertPageData', callback, priority);
+}
+
+export function hookAfterInsertPageData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: any,
+    connection: any
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertPageData', callback, priority);
+}
+
+export function hookBeforeCreatePage(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: any,
+    context: any
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('createPage', callback, priority);
+}
+
+export function hookAfterCreatePage(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: any,
+    context: any
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('createPage', callback, priority);
+}

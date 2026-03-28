@@ -7,7 +7,7 @@ import {
 } from '@evershop/postgres-query-builder';
 import type { PoolClient } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import { ProductData } from './createProduct.js';
 
 async function deleteProductData(uuid: string, connection: PoolClient) {
@@ -80,3 +80,55 @@ export default async (
     throw e;
   }
 };
+
+export function hookBeforeDeleteProductData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('deleteProductData', callback, priority);
+}
+
+export function hookAfterDeleteProductData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('deleteProductData', callback, priority);
+}
+
+export function hookBeforeDeleteProduct(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('deleteProduct', callback, priority);
+}
+
+export function hookAfterDeleteProduct(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('deleteProduct', callback, priority);
+}

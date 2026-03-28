@@ -1,3 +1,4 @@
+import { Row } from '@components/common/form/Editor.js';
 import {
   commit,
   insert,
@@ -8,7 +9,7 @@ import {
 import type { PoolClient } from '@evershop/postgres-query-builder';
 import { JSONSchemaType } from 'ajv';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
@@ -16,7 +17,6 @@ import {
 import { sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import categoryDataSchema from './categoryDataSchema.json' with { type: 'json' };
-import { Row } from '@components/common/form/Editor.js';
 
 export type CategoryData = {
   name: string;
@@ -112,3 +112,55 @@ export default async (data: CategoryData, context: Record<string, any>) => {
   const category = await hookable(createCategory, context)(data, context);
   return category;
 };
+
+export function hookBeforeInsertCategoryData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: CategoryData & { parent_id?: number },
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertCategoryData', callback, priority);
+}
+
+export function hookAfterInsertCategoryData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: CategoryData & { parent_id?: number },
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertCategoryData', callback, priority);
+}
+
+export function hookBeforeCreateCategory(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: CategoryData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('createCategory', callback, priority);
+}
+
+export function hookAfterCreateCategory(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: CategoryData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('createCategory', callback, priority);
+}

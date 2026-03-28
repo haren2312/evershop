@@ -9,7 +9,7 @@ import {
   PoolClient
 } from '@evershop/postgres-query-builder';
 import { pool } from '../../../lib/postgres/connection.js';
-import { hookable } from '../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../lib/util/hookable.js';
 import { Address } from '../../../types/customerAddress.js';
 import { validateAddress } from '../../customer/services/customer/address/addressValidators.js';
 
@@ -155,3 +155,85 @@ export const addBillingAddress = async (
   })(cartUUID, addressData, context);
   return result;
 };
+
+export function hookBeforeSaveBillingAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    addressData: Address,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('saveBillingAddress', callback, priority);
+}
+
+export function hookAfterSaveBillingAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    addressData: Address,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('saveBillingAddress', callback, priority);
+}
+
+export function hookBeforeUpdateCartWithAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    cartId: number,
+    addressId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateCartWithAddress', callback, priority);
+}
+
+export function hookAfterUpdateCartWithAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    cartId: number,
+    addressId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateCartWithAddress', callback, priority);
+}
+
+export function hookBeforeAddBillingAddressService(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    cartUUID: string,
+    addressData: Address,
+    context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('addBillingAddressService', callback, priority);
+}
+
+export function hookAfterAddBillingAddressService(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    cartUUID: string,
+    addressData: Address,
+    context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('addBillingAddressService', callback, priority);
+}

@@ -10,7 +10,7 @@ import {
   insert
 } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import { getValueSync, getValue } from '../../../../lib/util/registry.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import attributeDataSchema from './attributeDataSchema.json' with { type: 'json' };
@@ -234,3 +234,119 @@ export default async (uuid: string, data: AttributeData, context: Record<string,
   );
   return attribute;
 };
+
+export function hookBeforeUpdateAttributeData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: AttributeData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateAttributeData', callback, priority);
+}
+
+export function hookAfterUpdateAttributeData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: AttributeData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateAttributeData', callback, priority);
+}
+
+export function hookBeforeUpdateAttributeGroups(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    attributeId: number,
+    groups: number[],
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateAttributeGroups', callback, priority);
+}
+
+export function hookAfterUpdateAttributeGroups(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    attributeId: number,
+    groups: number[],
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateAttributeGroups', callback, priority);
+}
+
+export function hookBeforeUpdateAttributeOptions(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    attributeId: number,
+    attributeType: string,
+    attributeCode: string,
+    options: { option_text: string; option_id: string | number }[],
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateAttributeOptions', callback, priority);
+}
+
+export function hookAfterUpdateAttributeOptions(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    attributeId: number,
+    attributeType: string,
+    attributeCode: string,
+    options: { option_text: string; option_id: string | number }[],
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateAttributeOptions', callback, priority);
+}
+
+export function hookBeforeUpdateAttribute(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: AttributeData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateAttribute', callback, priority);
+}
+
+export function hookAfterUpdateAttribute(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: AttributeData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateAttribute', callback, priority);
+}

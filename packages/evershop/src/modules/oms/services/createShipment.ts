@@ -7,7 +7,7 @@ import {
 } from '@evershop/postgres-query-builder';
 import { PoolClient } from 'pg';
 import { getConnection } from '../../../lib/postgres/connection.js';
-import { hookable } from '../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../lib/util/hookable.js';
 import addOrderActivityLog from './addOrderActivityLog.js';
 import { updateShipmentStatus } from './updateShipmentStatus.js';
 
@@ -89,3 +89,33 @@ export default async (
     throw e;
   }
 };
+
+export function hookBeforeCreateShipment(
+  callback: (
+    this: { order: Record<string, any>; carrier: string | null; trackingNumber: string | null },
+    ...args: [
+    orderId: number,
+    carrier: string | null,
+    trackingNumber: string | null,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('createShipment', callback, priority);
+}
+
+export function hookAfterCreateShipment(
+  callback: (
+    this: { order: Record<string, any>; carrier: string | null; trackingNumber: string | null },
+    ...args: [
+    orderId: number,
+    carrier: string | null,
+    trackingNumber: string | null,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('createShipment', callback, priority);
+}

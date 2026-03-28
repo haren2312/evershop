@@ -1,25 +1,28 @@
 import {
   commit,
+  PoolClient,
   rollback,
   select,
   startTransaction,
   update
 } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
 } from '../../../../lib/util/registry.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import couponDataSchema from './couponDataSchema.json' with { type: 'json' };
+import type { CouponData } from './createCoupon.js';
 
-function validateCouponDataBeforeInsert(data) {
+function validateCouponDataBeforeUpdate(data: Partial<CouponData>): Partial<CouponData> {
   const ajv = getAjv();
-  couponDataSchema.required = [];
+  (couponDataSchema as any).required = [];
   const jsonSchema = getValueSync(
     'updateCouponDataJsonSchema',
-    couponDataSchema
+    couponDataSchema,
+    {}
   );
   const validate = ajv.compile(jsonSchema);
   const valid = validate(data);
@@ -30,7 +33,7 @@ function validateCouponDataBeforeInsert(data) {
   }
 }
 
-async function updateCouponData(uuid, data, connection) {
+async function updateCouponData(uuid: string, data: Partial<CouponData>, connection: PoolClient) {
   const coupon = await select()
     .from('coupon')
     .where('uuid', '=', uuid)
@@ -58,18 +61,19 @@ async function updateCouponData(uuid, data, connection) {
 
 /**
  * Update coupon service. This service will update a coupon with all related data
- * @param {Object} data
- * @param {Object} context
+ * @param {string} uuid
+ * @param {Partial<CouponData>} data
+ * @param {Record<string, any>} context
  */
-async function updateCoupon(uuid, data, context) {
+async function updateCoupon(uuid: string, data: Partial<CouponData>, context: Record<string, any>) {
   const connection = await getConnection();
   await startTransaction(connection);
   try {
     const couponData = await getValue('couponDataBeforeUpdate', data);
     // Validate coupon data
-    validateCouponDataBeforeInsert(couponData);
+    validateCouponDataBeforeUpdate(couponData);
 
-    // Insert coupon data
+    // Update coupon data
     const coupon = await hookable(updateCouponData, { ...context, connection })(
       uuid,
       couponData,
@@ -84,7 +88,7 @@ async function updateCoupon(uuid, data, context) {
   }
 }
 
-export default async (uuid, data, context) => {
+export default async (uuid: string, data: Partial<CouponData>, context: Record<string, any> = {}) => {
   // Make sure the context is either not provided or is an object
   if (context && typeof context !== 'object') {
     throw new Error('Context must be an object');
@@ -92,3 +96,31 @@ export default async (uuid, data, context) => {
   const coupon = await hookable(updateCoupon, context)(uuid, data, context);
   return coupon;
 };
+
+export function hookBeforeUpdateCouponData(
+  callback: (uuid: string, data: Partial<CouponData>, connection: PoolClient) => Promise<void>,
+  priority?: number
+): void {
+  hookBefore('updateCouponData', callback, priority);
+}
+
+export function hookAfterUpdateCouponData(
+  callback: (uuid: string, data: Partial<CouponData>, connection: PoolClient) => Promise<void>,
+  priority?: number
+): void {
+  hookAfter('updateCouponData', callback, priority);
+}
+
+export function hookBeforeUpdateCoupon(
+  callback: (uuid: string, data: Partial<CouponData>, context: Record<string, any>) => Promise<void>,
+  priority?: number
+): void {
+  hookBefore('updateCoupon', callback, priority);
+}
+
+export function hookAfterUpdateCoupon(
+  callback: (uuid: string, data: Partial<CouponData>, context: Record<string, any>) => Promise<void>,
+  priority?: number
+): void {
+  hookAfter('updateCoupon', callback, priority);
+}

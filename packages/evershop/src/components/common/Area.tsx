@@ -1,5 +1,6 @@
 import { useAppState } from '@components/common/context/app.js';
 import { generateComponentKey } from '@evershop/evershop/lib/util/keyGenerator';
+import type { WidgetInstance } from '@evershop/evershop/types/widget';
 import React, { useEffect, useState } from 'react';
 import type { ElementType } from 'react';
 
@@ -30,12 +31,6 @@ interface AreaProps {
   wrapperProps?: Record<string, any>;
   components?: Components;
   [key: string]: unknown;
-}
-
-interface Widget extends Component {
-  props: Record<string, any>;
-  type: string;
-  areaId: string[];
 }
 
 const DEBUG_KEY = 'evershop_area_debug';
@@ -180,7 +175,7 @@ function Area(props: AreaProps) {
     const wildCardWidgets = components?.['*'] || {};
     const assignedWidgets: Component[] = [];
 
-    widgets.forEach((widget: Widget) => {
+    widgets.forEach((widget: WidgetInstance) => {
       const adminKey = generateComponentKey(`admin_widget_${widget.type}`);
       const frontKey = generateComponentKey(`widget_${widget.type}`);
       const w = wildCardWidgets[adminKey] || wildCardWidgets[frontKey];

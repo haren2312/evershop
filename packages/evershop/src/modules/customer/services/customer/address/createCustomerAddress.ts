@@ -8,7 +8,7 @@ import {
   update
 } from '@evershop/postgres-query-builder';
 import { getConnection, pool } from '../../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../../lib/util/hookable.js';
 import { getValue } from '../../../../../lib/util/registry.js';
 import { Address } from '../../../../../types/customerAddress.js';
 import { validateAddress } from './addressValidators.js';
@@ -103,3 +103,57 @@ export default async (
   );
   return address;
 };
+
+export function hookBeforeInsertCustomerAddressData(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    data: Address,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertCustomerAddressData', callback, priority);
+}
+
+export function hookAfterInsertCustomerAddressData(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    data: Address,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertCustomerAddressData', callback, priority);
+}
+
+export function hookBeforeCreateCustomerAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    customerUUID: string,
+    address: Address,
+    context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('createCustomerAddress', callback, priority);
+}
+
+export function hookAfterCreateCustomerAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    customerUUID: string,
+    address: Address,
+    context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('createCustomerAddress', callback, priority);
+}

@@ -8,7 +8,7 @@ import {
 } from '@evershop/postgres-query-builder';
 import { JSONSchemaType } from 'ajv';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
@@ -102,3 +102,59 @@ export default async (uuid: string, data: CustomerData, context: Record<string, 
   const customer = await hookable(updateCustomer, context)(uuid, data, context);
   return customer;
 };
+
+export function hookBeforeUpdateCustomerData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: CustomerData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateCustomerData', callback, priority);
+}
+
+export function hookAfterUpdateCustomerData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: CustomerData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateCustomerData', callback, priority);
+}
+
+export function hookBeforeUpdateCustomer(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: CustomerData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateCustomer', callback, priority);
+}
+
+export function hookAfterUpdateCustomer(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: CustomerData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateCustomer', callback, priority);
+}

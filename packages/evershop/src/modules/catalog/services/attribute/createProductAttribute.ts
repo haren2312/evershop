@@ -8,7 +8,7 @@ import {
 } from '@evershop/postgres-query-builder';
 import type { PoolClient } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
@@ -164,3 +164,139 @@ export default async (data: AttributeData, context: Record<string, any>) => {
   const attribute = await hookable(createAttribute, context)(data, context);
   return attribute;
 };
+
+export function hookBeforeInsertAttributeData(
+  callback: (
+    this: {
+      connection: PoolClient;
+      [key: string]: unknown
+    },
+    ...args: [
+    data: AttributeData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertAttributeData', callback, priority);
+}
+
+export function hookAfterInsertAttributeData(
+  callback: (
+    this: {
+      connection: PoolClient;
+      [key: string]: unknown
+    },
+    ...args: [
+    data: AttributeData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertAttributeData', callback, priority);
+}
+
+export function hookBeforeInsertAttributeGroups(
+  callback: (
+    this: {
+      connection: PoolClient;
+      [key: string]: unknown
+    },
+    ...args: [
+    attributeId: number,
+    groups: number[],
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertAttributeGroups', callback, priority);
+}
+
+export function hookAfterInsertAttributeGroups(
+  callback: (
+    this: {
+      connection: PoolClient;
+      [key: string]: unknown
+    },
+    ...args: [
+    attributeId: number,
+    groups: number[],
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertAttributeGroups', callback, priority);
+}
+
+export function hookBeforeInsertAttributeOptions(
+  callback: (
+    this: {
+      connection: PoolClient;
+      [key: string]: unknown
+    },
+    ...args: [
+    attributeId: number,
+    attributeType: string,
+    attributeCode: string,
+    options: { option_text: string }[],
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertAttributeOptions', callback, priority);
+}
+
+export function hookAfterInsertAttributeOptions(
+  callback: (
+    this: {
+      connection: PoolClient;
+      [key: string]: unknown
+    },
+    ...args: [
+    attributeId: number,
+    attributeType: string,
+    attributeCode: string,
+    options: { option_text: string }[],
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertAttributeOptions', callback, priority);
+}
+
+export function hookBeforeCreateAttribute(
+  callback: (
+    this: {
+      connection: PoolClient;
+      [key: string]: unknown
+    },
+    ...args: [
+    data: AttributeData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('createAttribute', callback, priority);
+}
+
+export function hookAfterCreateAttribute(
+  callback: (
+    this: {
+      connection: PoolClient;
+      [key: string]: unknown
+    },
+    ...args: [
+    data: AttributeData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('createAttribute', callback, priority);
+}

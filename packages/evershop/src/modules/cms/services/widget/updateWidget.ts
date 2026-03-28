@@ -1,25 +1,28 @@
 import {
   commit,
+  PoolClient,
   rollback,
   select,
   startTransaction,
   update
 } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
 } from '../../../../lib/util/registry.js';
 import { getAjv } from '../../../base/services/getAjv.js';
+import { WidgetData } from './createWidget.js';
 import widgetDataSchema from './widgetDataSchema.json' with { type: 'json' };
 
-function validateWidgetDataBeforeInsert(data) {
+function validateWidgetDataBeforeInsert(data: Partial<WidgetData>): Partial<WidgetData> {
   const ajv = getAjv();
-  widgetDataSchema.required = ['status'];
+  (widgetDataSchema as any).required = ['status'];
   const jsonSchema = getValueSync(
     'updateWidgetDataJsonSchema',
-    widgetDataSchema
+    widgetDataSchema,
+    {}
   );
   const validate = ajv.compile(jsonSchema);
   const valid = validate(data);
@@ -30,7 +33,11 @@ function validateWidgetDataBeforeInsert(data) {
   }
 }
 
-async function updateWidgetData(uuid, data, connection) {
+async function updateWidgetData(
+  uuid: string,
+  data: Partial<WidgetData>,
+  connection: PoolClient
+) {
   const query = select().from('widget');
   const widget = await query.where('uuid', '=', uuid).load(connection);
 
@@ -51,7 +58,11 @@ async function updateWidgetData(uuid, data, connection) {
  * @param {Object} data
  * @param {Object} context
  */
-async function updateWidget(uuid, data, context) {
+async function updateWidget(
+  uuid: string,
+  data: Partial<WidgetData>,
+  context: Record<string, any>
+) {
   const connection = await getConnection();
   await startTransaction(connection);
   try {
@@ -59,7 +70,7 @@ async function updateWidget(uuid, data, context) {
     // Validate widget data
     validateWidgetDataBeforeInsert(widgetData);
 
-    // Insert widget data
+    // Update widget data
     const widget = await hookable(updateWidgetData, { ...context, connection })(
       uuid,
       widgetData,
@@ -74,7 +85,11 @@ async function updateWidget(uuid, data, context) {
   }
 }
 
-export default async (uuid, data, context) => {
+export default async (
+  uuid: string,
+  data: Partial<WidgetData>,
+  context: Record<string, any>
+) => {
   // Make sure the context is either not provided or is an object
   if (context && typeof context !== 'object') {
     throw new Error('Context must be an object');
@@ -82,3 +97,43 @@ export default async (uuid, data, context) => {
   const widget = await hookable(updateWidget, context)(uuid, data, context);
   return widget;
 };
+
+export function hookBeforeUpdateWidgetData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [uuid: string, data: Partial<WidgetData>, connection: PoolClient]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateWidgetData', callback, priority);
+}
+
+export function hookAfterUpdateWidgetData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [uuid: string, data: Partial<WidgetData>, connection: PoolClient]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateWidgetData', callback, priority);
+}
+
+export function hookBeforeUpdateWidget(
+  callback: (
+    this: Record<string, any>,
+    ...args: [uuid: string, data: Partial<WidgetData>, context: Record<string, any>]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateWidget', callback, priority);
+}
+
+export function hookAfterUpdateWidget(
+  callback: (
+    this: Record<string, any>,
+    ...args: [uuid: string, data: Partial<WidgetData>, context: Record<string, any>]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateWidget', callback, priority);
+}

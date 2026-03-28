@@ -13,7 +13,7 @@ import { JSONSchemaType } from 'ajv';
 import { error } from '../../../../lib/log/logger.js';
 import { getConnection } from '../../../../lib/postgres/connection.js';
 import { getBaseUrl } from '../../../../lib/util/getBaseUrl.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
@@ -434,3 +434,145 @@ export default async (uuid: string, data: ProductData, context: Record<string, a
   const product = await hookable(updateProduct, context)(uuid, data, context);
   return product;
 };
+
+export function hookBeforeUpdateProductData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: ProductData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateProductData', callback, priority);
+}
+
+export function hookAfterUpdateProductData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: ProductData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateProductData', callback, priority);
+}
+
+export function hookBeforeUpdateProductInventory(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    inventoryData: ProductInventoryData,
+    productId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateProductInventory', callback, priority);
+}
+
+export function hookAfterUpdateProductInventory(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    inventoryData: ProductInventoryData,
+    productId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateProductInventory', callback, priority);
+}
+
+export function hookBeforeUpdateProductAttributes(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    attributes: any[],
+    productId: any,
+    variantGroupId: any,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateProductAttributes', callback, priority);
+}
+
+export function hookAfterUpdateProductAttributes(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    attributes: any[],
+    productId: any,
+    variantGroupId: any,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateProductAttributes', callback, priority);
+}
+
+export function hookBeforeUpdateProductImages(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    images: any[],
+    productId: any,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateProductImages', callback, priority);
+}
+
+export function hookAfterUpdateProductImages(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    images: any[],
+    productId: any,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateProductImages', callback, priority);
+}
+
+export function hookBeforeUpdateProduct(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: ProductData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateProduct', callback, priority);
+}
+
+export function hookAfterUpdateProduct(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    data: ProductData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateProduct', callback, priority);
+}

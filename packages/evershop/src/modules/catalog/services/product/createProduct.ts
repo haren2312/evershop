@@ -1,3 +1,4 @@
+import { Row } from '@components/common/form/Editor.js';
 import {
   commit,
   insert,
@@ -11,7 +12,7 @@ import type { PoolClient } from '@evershop/postgres-query-builder';
 import { JSONSchemaType } from 'ajv';
 import { getConnection } from '../../../../lib/postgres/connection.js';
 import { getBaseUrl } from '../../../../lib/util/getBaseUrl.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
@@ -19,7 +20,6 @@ import {
 import { sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import productDataSchema from './productDataSchema.json'  with { type: 'json' };
-import { Row } from '@components/common/form/Editor.js';
 
 export type ProductData = ProductInventoryData & {
   name: string,
@@ -287,3 +287,139 @@ export default async (data: ProductData, context: Record<string, any>) => {
   const product = await hookable(createProduct, context)(data, context);
   return product;
 };
+
+export function hookBeforeInsertProductData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: ProductData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertProductData', callback, priority);
+}
+
+export function hookAfterInsertProductData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: ProductData,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertProductData', callback, priority);
+}
+
+export function hookBeforeInsertProductInventory(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    inventoryData: ProductInventoryData,
+    productId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertProductInventory', callback, priority);
+}
+
+export function hookAfterInsertProductInventory(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    inventoryData: ProductInventoryData,
+    productId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertProductInventory', callback, priority);
+}
+
+export function hookBeforeInsertProductAttributes(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    attributes: ProductAttributeData[],
+    productId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertProductAttributes', callback, priority);
+}
+
+export function hookAfterInsertProductAttributes(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    attributes: ProductAttributeData[],
+    productId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertProductAttributes', callback, priority);
+}
+
+export function hookBeforeInsertProductImages(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    images: string[],
+    productId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('insertProductImages', callback, priority);
+}
+
+export function hookAfterInsertProductImages(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    images: string[],
+    productId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('insertProductImages', callback, priority);
+}
+
+export function hookBeforeCreateProduct(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: ProductData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('createProduct', callback, priority);
+}
+
+export function hookAfterCreateProduct(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    data: ProductData,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('createProduct', callback, priority);
+}

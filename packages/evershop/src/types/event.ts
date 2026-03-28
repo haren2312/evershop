@@ -82,40 +82,54 @@ export interface EventDataRegistry {
   };
 
   /**
-   * Fired when a new customer is registered
+   * Fired when a new customer is registered and status = 1 (account is active)
    * Data: Complete customer table row
    */
   customer_registered: CustomerRow;
 
   /**
-   * Fired when a new order is created
+   * Fired when a new customer record is added to database, regardless of the status value
+   * Data: Complete customer table row
+   */
+  customer_created: CustomerRow;
+
+  /**
+   * Fired when a customer record in database is updated
+   * Data: Complete customer table row
+   */
+  customer_updated: CustomerRow;
+
+  /**
+   * Fired when a customer record is deleted
+   * Data: Complete customer table row
+   */
+  customer_deleted: CustomerRow;
+
+  /**
+   * Fired when a new order record is created in database, regardless of the payment method or order status
    * Data: Complete order table row
    */
   order_created: OrderRow;
 
   /**
    * Fired when a new order is placed
-   * Data: Complete order table row
+   * (This means the order is created and the payment is successful (decided by the payment method, for example, for cod, the order is created when the order is placed, but for online payment, the order is created when the payment is successful))
    */
   order_placed: OrderRow;
 
   /**
-   * Fired when a new customer is created by admin
-   * Data: Complete customer table row
+   * Fired when an order status is updated.
+   * Data: {
+   *   orderId: number;
+   *   before: string; // the previous order status
+   *   after: string; // the new order status
+   * }
    */
-  customer_created: CustomerRow;
-
-  /**
-   * Fired when a customer is updated by admin
-   * Data: Complete customer table row
-   */
-  customer_updated: CustomerRow;
-
-  /**
-   * Fired when a customer is deleted by admin
-   * Data: Complete customer table row
-   */
-  customer_deleted: CustomerRow;
+  order_status_updated: {
+    orderId: number;
+    before: string;
+    after: string;
+  };
 }
 
 /**

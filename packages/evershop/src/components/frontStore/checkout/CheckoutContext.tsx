@@ -2,8 +2,8 @@ import {
   useCartState,
   useCartDispatch
 } from '@components/frontStore/cart/CartContext.js';
-import { _ } from '@evershop/evershop/lib/locale/translate/_';
 import { CreateOrderResult } from '@evershop/evershop/checkout/services';
+import { _ } from '@evershop/evershop/lib/locale/translate/_';
 import { CheckoutData } from '@evershop/evershop/types/checkoutData';
 import { produce } from 'immer';
 import React, {
@@ -12,7 +12,8 @@ import React, {
   useContext,
   ReactNode,
   useCallback,
-  useMemo
+  useMemo,
+  useRef
 } from 'react';
 import { UseFormReturn, FieldValues } from 'react-hook-form';
 
@@ -195,6 +196,9 @@ export function CheckoutProvider({
     allowGuestCheckout
   });
 
+  // Ref so checkout() always reads the latest checkoutData without needing a re-render.
+  const checkoutDataRef = useRef<CheckoutData>(state.checkoutData);
+
   // Get cart state for computing requiresShipment and cartId
   const cartState = useCartState();
   const cartDispatch = useCartDispatch();
@@ -299,7 +303,7 @@ export function CheckoutProvider({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cart_id: cartId,
-          ...state.checkoutData
+          ...checkoutDataRef.current
         })
       })
     );
@@ -321,7 +325,6 @@ export function CheckoutProvider({
   }, [
     cartState.data?.checkoutApi,
     cartId,
-    state.checkoutData,
     form,
     enableForm,
     disableForm
@@ -329,14 +332,17 @@ export function CheckoutProvider({
 
   // Checkout data management
   const setCheckoutData = useCallback((data: CheckoutData) => {
+    checkoutDataRef.current = data;
     dispatch({ type: 'SET_CHECKOUT_DATA', payload: data });
   }, []);
 
   const updateCheckoutData = useCallback((data: Partial<CheckoutData>) => {
+    checkoutDataRef.current = { ...checkoutDataRef.current, ...data };
     dispatch({ type: 'UPDATE_CHECKOUT_DATA', payload: data });
   }, []);
 
   const clearCheckoutData = useCallback(() => {
+    checkoutDataRef.current = {};
     dispatch({ type: 'CLEAR_CHECKOUT_DATA' });
   }, []);
 

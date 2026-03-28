@@ -7,7 +7,7 @@ import {
   startTransaction
 } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../../lib/util/hookable.js';
 import { Address } from '../../../../../types/customerAddress.js';
 
 async function deleteCustomerAddressData(uuid: string, connection: PoolClient) {
@@ -68,3 +68,55 @@ export default async (
   );
   return customerAddress;
 };
+
+export function hookBeforeDeleteCustomerAddressData(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    uuid: string,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('deleteCustomerAddressData', callback, priority);
+}
+
+export function hookAfterDeleteCustomerAddressData(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    uuid: string,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('deleteCustomerAddressData', callback, priority);
+}
+
+export function hookBeforeDeleteCustomerAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    uuid: string,
+    context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('deleteCustomerAddress', callback, priority);
+}
+
+export function hookAfterDeleteCustomerAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+    uuid: string,
+    context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('deleteCustomerAddress', callback, priority);
+}

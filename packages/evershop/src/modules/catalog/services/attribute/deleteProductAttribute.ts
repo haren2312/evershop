@@ -7,7 +7,7 @@ import {
 } from '@evershop/postgres-query-builder';
 import type { PoolClient } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 
 async function deleteAttributeData(uuid: string, connection: PoolClient) {
   await del('attribute').where('uuid', '=', uuid).execute(connection);
@@ -69,3 +69,55 @@ export default async (uuid: string, context: Record<string, any>) => {
   const attribute = await hookable(deleteAttribute, context)(uuid, context);
   return attribute;
 };
+
+export function hookBeforeDeleteAttributeData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('deleteAttributeData', callback, priority);
+}
+
+export function hookAfterDeleteAttributeData(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('deleteAttributeData', callback, priority);
+}
+
+export function hookBeforeDeleteAttribute(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('deleteAttribute', callback, priority);
+}
+
+export function hookAfterDeleteAttribute(
+  callback: (
+    this: Record<string, any>,
+    ...args: [
+    uuid: string,
+    context: Record<string, any>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('deleteAttribute', callback, priority);
+}

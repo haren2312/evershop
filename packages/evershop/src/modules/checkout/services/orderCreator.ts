@@ -11,7 +11,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { pool } from '../../../lib/postgres/connection.js';
 import { getConfig } from '../../../lib/util/getConfig.js';
-import { hookable } from '../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../lib/util/hookable.js';
 import type { OrderRow, InsertResultWithRow } from '../../../types/db/index.js';
 import { PaymentStatus, ShipmentStatus } from '../../../types/order.js';
 import addOrderActivityLog from '../../oms/services/addOrderActivityLog.js';
@@ -223,3 +223,107 @@ export const createOrder = async <T extends CreateOrderResult>(
   })(cart);
   return order;
 };
+
+export function hookBeforeDisableCart(
+  callback: (
+    this: { cart: Cart },
+    ...args: [
+    cartId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('disableCart', callback, priority);
+}
+
+export function hookAfterDisableCart(
+  callback: (
+    this: { cart: Cart },
+    ...args: [
+    cartId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('disableCart', callback, priority);
+}
+
+export function hookBeforeSaveOrder(
+  callback: (
+    this: { cart: Cart },
+    ...args: [
+    cart: Cart,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('saveOrder', callback, priority);
+}
+
+export function hookAfterSaveOrder(
+  callback: (
+    this: { cart: Cart },
+    ...args: [
+    cart: Cart,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('saveOrder', callback, priority);
+}
+
+export function hookBeforeSaveOrderItems(
+  callback: (
+    this: { cart: Cart },
+    ...args: [
+    cart: Cart,
+    orderId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('saveOrderItems', callback, priority);
+}
+
+export function hookAfterSaveOrderItems(
+  callback: (
+    this: { cart: Cart },
+    ...args: [
+    cart: Cart,
+    orderId: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('saveOrderItems', callback, priority);
+}
+
+export function hookBeforeCreateOrderFunc(
+  callback: (
+    this: { cart: Cart },
+    ...args: [
+    cart: Cart
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('createOrderFunc', callback, priority);
+}
+
+export function hookAfterCreateOrderFunc(
+  callback: (
+    this: { cart: Cart },
+    ...args: [
+    cart: Cart
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('createOrderFunc', callback, priority);
+}

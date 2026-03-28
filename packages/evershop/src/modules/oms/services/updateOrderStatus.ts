@@ -15,7 +15,8 @@ import Topo from '@hapi/topo';
 import { error } from '../../../lib/log/logger.js';
 import { pool } from '../../../lib/postgres/connection.js';
 import { getConfig } from '../../../lib/util/getConfig.js';
-import { hookable } from '../../../lib/util/hookable.js';
+import { hookable, hookAfter, hookBefore } from '../../../lib/util/hookable.js';
+import { OrderRow } from '../../../types/db/index.js';
 import { PaymentStatus, ShipmentStatus } from '../../../types/order.js';
 
 function getOrderStatusFlow() {
@@ -72,6 +73,14 @@ export function resolveOrderStatus(
   return nextStatus;
 }
 
+/**
+ * This function means to be private and should not be called outside of this module. It will not perform any validation and directly update the order status.
+ * You should consider updating the payment status and shipment status only, and let the system to update the order status automatically.
+ *
+ * @param orderId
+ * @param status
+ * @param connection
+ */
 async function updateOrderStatus(
   orderId: number,
   status: string,
@@ -95,7 +104,7 @@ async function addOrderStatusChangeEvents(
     .given({
       name: 'order_status_updated',
       data: {
-        order_id: orderId,
+        orderId: orderId,
         before,
         after
       }
@@ -110,12 +119,16 @@ export async function changeOrderStatus(
 ) {
   const statusFlow = getOrderStatusFlow();
   const connection = conn || (await getConnection(pool));
-  const order = await select()
+  const order = (await select()
     .from('order')
     .where('order_id', '=', orderId)
-    .load(connection, false);
+    .load(connection, false)) as OrderRow | null;
   if (!order) {
     throw new Error('Order not found');
+  }
+
+  if (order.status === status) {
+    return;
   }
   // Do not allow to revert the status
   if (statusFlow.indexOf(order.status) > statusFlow.indexOf(status)) {
@@ -135,7 +148,12 @@ export async function changeOrderStatus(
     await hookable(addOrderStatusChangeEvents, {
       order,
       status
-    })(order.order_id, order.status.toString(), status, connection);
+    })(
+      order.order_id,
+      order.status ? order.status.toString() : 'unknown',
+      status,
+      connection
+    );
 
     if (!conn) {
       await commit(connection);
@@ -147,4 +165,76 @@ export async function changeOrderStatus(
     }
     throw err;
   }
+}
+
+export function hookBeforeUpdateOrderStatus(
+  callback: (
+    this: {
+      order: OrderRow;
+      status: string;
+    },
+    ...args: [
+      orderId: number,
+      status: string,
+      connection: PoolClient,
+      ...args: any[]
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateOrderStatus', callback, priority);
+}
+
+export function hookAfterUpdateOrderStatus(
+  callback: (
+    this: {
+      order: OrderRow;
+      status: string;
+    },
+    ...args: [
+      orderId: number,
+      status: string,
+      connection: PoolClient,
+      ...args: any[]
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateOrderStatus', callback, priority);
+}
+
+export function hookBeforeAddOrderStatusChangeEvents(
+  callback: (
+    this: {
+      order: OrderRow;
+      status: string;
+    },
+    ...args: [
+      orderId: number,
+      before: string,
+      after: string,
+      connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('addOrderStatusChangeEvents', callback, priority);
+}
+
+export function hookAfterAddOrderStatusChangeEvents(
+  callback: (
+    this: {
+      order: OrderRow;
+      status: string;
+    },
+    ...args: [
+      orderId: number,
+      before: string,
+      after: string,
+      connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('addOrderStatusChangeEvents', callback, priority);
 }

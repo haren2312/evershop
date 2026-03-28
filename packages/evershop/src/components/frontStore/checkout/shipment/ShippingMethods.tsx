@@ -151,7 +151,7 @@ export function ShippingMethods({
                   </div>
                 ) : (
                   <RadioGroup
-                    value={currentValue}
+                    value={currentValue ?? ''}
                     onValueChange={(value) => {
                       const method = methods.find((m) => m.code === value);
                       if (method) {

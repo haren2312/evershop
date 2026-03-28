@@ -94,7 +94,7 @@ export function PaymentMethods({
                     </div>
                   ) : (
                     <RadioGroup
-                      value={selectedPaymentMethod}
+                      value={selectedPaymentMethod ?? ''}
                       onValueChange={(value) => {
                         setValue('paymentMethod', value);
                       }}

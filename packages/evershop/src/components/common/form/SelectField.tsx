@@ -112,7 +112,7 @@ export function SelectField<T extends FieldValues = FieldValues>({
         defaultValue={hasDefaultValue ? defaultValue : ('' as any)}
         render={({ field }) => (
           <Select
-            value={options.find((o) => o.value === field.value)}
+            value={options.find((o) => o.value === field.value) ?? null}
             onValueChange={(value) => {
               const newValue = value?.value === '' ? '' : value?.value;
               field.onChange(newValue);

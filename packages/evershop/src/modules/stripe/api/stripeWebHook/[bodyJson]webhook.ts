@@ -1,5 +1,4 @@
 import {
-  insert,
   startTransaction,
   commit,
   rollback,
@@ -12,24 +11,33 @@ import { emit } from '../../../../lib/event/emitter.js';
 import { debug, error } from '../../../../lib/log/logger.js';
 import { getConnection } from '../../../../lib/postgres/connection.js';
 import { getConfig } from '../../../../lib/util/getConfig.js';
+import { EvershopRequest } from '../../../../types/request.js';
+import { EvershopResponse } from '../../../../types/response.js';
 import addOrderActivityLog from '../../../oms/services/addOrderActivityLog.js';
 import { updatePaymentStatus } from '../../../oms/services/updatePaymentStatus.js';
 import { getSetting } from '../../../setting/services/setting.js';
 
-export default async (request, response, next) => {
+export default async (
+  request: EvershopRequest,
+  response: EvershopResponse,
+  next
+) => {
   const sig = request.headers['stripe-signature'];
 
   let event;
   const connection = await getConnection();
   try {
-    const stripeConfig = getConfig('system.stripe', {});
+    const stripeConfig = getConfig('system.stripe', {}) as {
+      secretKey?: string;
+      endpointSecret?: string;
+    };
     let stripeSecretKey;
     if (stripeConfig.secretKey) {
       stripeSecretKey = stripeConfig.secretKey;
     } else {
       stripeSecretKey = await getSetting('stripeSecretKey', '');
     }
-    const stripe = stripePgk(stripeSecretKey);
+    const stripe = new stripePgk(stripeSecretKey, {} as stripePgk.StripeConfig);
 
     // Webhook enpoint secret
     let endpointSecret;
@@ -39,7 +47,11 @@ export default async (request, response, next) => {
       endpointSecret = await getSetting('stripeEndpointSecret', '');
     }
 
-    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(
+      request.body,
+      sig as string,
+      endpointSecret
+    );
     await startTransaction(connection);
     const paymentIntent = event.data.object;
     const { order_id } = paymentIntent.metadata;

@@ -1,7 +1,6 @@
 import config from 'config';
 import { getConfig } from '../../lib/util/getConfig.js';
 import { hookAfter } from '../../lib/util/hookable.js';
-import { addProcessor } from '../../lib/util/registry.js';
 import { registerPaymentMethod } from '../checkout/services/getAvailablePaymentMethods.js';
 import { getSetting } from '../setting/services/setting.js';
 import { cancelPaymentIntent } from './services/cancelPayment.js';
@@ -10,29 +9,29 @@ export default async () => {
   const authorizedPaymentStatus = {
     order: {
       paymentStatus: {
-        authorized: {
+        stripe_authorized: {
           name: 'Authorized',
           badge: 'warning'
         },
-        failed: {
+        stripe_failed: {
           name: 'Failed',
           badge: 'critical'
         },
-        refunded: {
+        stripe_refunded: {
           name: 'Refunded',
           badge: 'critical'
         },
-        partial_refunded: {
+        stripe_partial_refunded: {
           name: 'Partial Refunded',
           badge: 'critical'
         }
       },
       psoMapping: {
-        'authorized:*': 'processing',
-        'failed:*': 'new',
-        'refunded:*': 'closed',
-        'partial_refunded:*': 'processing',
-        'partial_refunded:delivered': 'completed'
+        'stripe_authorized:*': 'processing',
+        'stripe_failed:*': 'new',
+        'stripe_refunded:*': 'closed',
+        'stripe_partial_refunded:*': 'processing',
+        'stripe_partial_refunded:delivered': 'completed'
       }
     }
   };
@@ -54,7 +53,7 @@ export default async () => {
       name: await getSetting('stripeDisplayName', 'Stripe')
     }),
     validator: async () => {
-      const stripeConfig = getConfig('system.stripe', {});
+      const stripeConfig = getConfig('system.stripe', {}) ?? {};
       let stripeStatus;
       if (stripeConfig.status) {
         stripeStatus = stripeConfig.status;

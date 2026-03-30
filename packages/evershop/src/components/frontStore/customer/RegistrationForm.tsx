@@ -130,7 +130,7 @@ export const CustomerRegistrationForm: React.FC<{
                 component: {
                   default: <SubmitButton formId="registerForm" />
                 },
-                sortOrder: 30
+                sortOrder: 40
               }
             ]}
           />

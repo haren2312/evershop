@@ -1,7 +1,7 @@
-import { PaymentStatus } from '@evershop/evershop/types/order.js';
 import config from 'config';
 import { getConfig } from '../../lib/util/getConfig.js';
 import { hookAfter } from '../../lib/util/hookable.js';
+import { PaymentStatus } from '../../types/order.js';
 import { registerPaymentMethod } from '../checkout/services/getAvailablePaymentMethods.js';
 import { getSetting } from '../setting/services/setting.js';
 import { cancelPaymentIntent } from './services/cancelPayment.js';

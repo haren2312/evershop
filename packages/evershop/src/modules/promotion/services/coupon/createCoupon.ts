@@ -11,6 +11,7 @@ import {
   getValue,
   getValueSync
 } from '../../../../lib/util/registry.js';
+import type { CouponRow } from '../../../../types/db/index.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import couponDataSchema from './couponDataSchema.json' with { type: 'json' };
 
@@ -77,7 +78,7 @@ function validateCouponDataBeforeInsert(data: CouponData): CouponData {
   }
 }
 
-async function insertCouponData(data: CouponData, connection: PoolClient) {
+async function insertCouponData(data: CouponData, connection: PoolClient): Promise<CouponRow> {
   const coupon = await insert('coupon').given(data).execute(connection);
   return coupon;
 }
@@ -87,7 +88,7 @@ async function insertCouponData(data: CouponData, connection: PoolClient) {
  * @param {CouponData} data
  * @param {Record<string, any>} context
  */
-async function createCoupon(data: CouponData, context: Record<string, any>) {
+async function createCoupon(data: CouponData, context: Record<string, any>): Promise<CouponRow> {
   const connection = await getConnection();
   await startTransaction(connection);
   try {
@@ -108,7 +109,7 @@ async function createCoupon(data: CouponData, context: Record<string, any>) {
   }
 }
 
-export default async (data: CouponData, context: Record<string, any> = {}) => {
+export default async (data: CouponData, context: Record<string, any> = {}): Promise<CouponRow> => {
   // Make sure the context is either not provided or is an object
   if (context && typeof context !== 'object') {
     throw new Error('Context must be an object');

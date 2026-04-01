@@ -12,6 +12,7 @@ import {
   getValue,
   getValueSync
 } from '../../../../lib/util/registry.js';
+import type { CouponRow } from '../../../../types/db/index.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import couponDataSchema from './couponDataSchema.json' with { type: 'json' };
 import type { CouponData } from './createCoupon.js';
@@ -33,7 +34,7 @@ function validateCouponDataBeforeUpdate(data: Partial<CouponData>): Partial<Coup
   }
 }
 
-async function updateCouponData(uuid: string, data: Partial<CouponData>, connection: PoolClient) {
+async function updateCouponData(uuid: string, data: Partial<CouponData>, connection: PoolClient): Promise<CouponRow> {
   const coupon = await select()
     .from('coupon')
     .where('uuid', '=', uuid)
@@ -44,19 +45,22 @@ async function updateCouponData(uuid: string, data: Partial<CouponData>, connect
   }
 
   try {
-    const newCoupon = await update('coupon')
+    await update('coupon')
       .given(data)
       .where('uuid', '=', uuid)
       .execute(connection);
-
-    return newCoupon;
   } catch (e) {
     if (!e.message.includes('No data was provided')) {
       throw e;
-    } else {
-      return coupon;
     }
   }
+
+  const updatedCoupon: CouponRow = await select()
+    .from('coupon')
+    .where('uuid', '=', uuid)
+    .load(connection);
+
+  return updatedCoupon;
 }
 
 /**
@@ -65,7 +69,7 @@ async function updateCouponData(uuid: string, data: Partial<CouponData>, connect
  * @param {Partial<CouponData>} data
  * @param {Record<string, any>} context
  */
-async function updateCoupon(uuid: string, data: Partial<CouponData>, context: Record<string, any>) {
+async function updateCoupon(uuid: string, data: Partial<CouponData>, context: Record<string, any>): Promise<CouponRow> {
   const connection = await getConnection();
   await startTransaction(connection);
   try {
@@ -88,7 +92,7 @@ async function updateCoupon(uuid: string, data: Partial<CouponData>, context: Re
   }
 }
 
-export default async (uuid: string, data: Partial<CouponData>, context: Record<string, any> = {}) => {
+export default async (uuid: string, data: Partial<CouponData>, context: Record<string, any> = {}): Promise<CouponRow> => {
   // Make sure the context is either not provided or is an object
   if (context && typeof context !== 'object') {
     throw new Error('Context must be an object');

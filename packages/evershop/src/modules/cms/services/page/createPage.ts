@@ -11,10 +11,11 @@ import {
   getValueSync
 } from '../../../../lib/util/registry.js';
 import { sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
+import type { CmsPageRow, CmsPageDescriptionRow } from '../../../../types/db/index.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import pageDataSchema from './pageDataSchema.json' with { type: 'json' };
 
-function validatePageDataBeforeInsert(data) {
+function validatePageDataBeforeInsert(data): any {
   const ajv = getAjv();
   pageDataSchema.required = [
     'status',
@@ -33,7 +34,7 @@ function validatePageDataBeforeInsert(data) {
   }
 }
 
-async function insertPageData(data, connection) {
+async function insertPageData(data, connection): Promise<CmsPageRow & CmsPageDescriptionRow> {
   const page = await insert('cms_page').given(data).execute(connection);
   const description = await insert('cms_page_description')
     .given(data)
@@ -51,7 +52,7 @@ async function insertPageData(data, connection) {
  * @param {Object} data
  * @param {Object} context
  */
-async function createPage(data, context) {
+const _createPage = async function createPage(data, context): Promise<CmsPageRow & CmsPageDescriptionRow> {
   const connection = await getConnection();
   await startTransaction(connection);
   try {
@@ -76,12 +77,12 @@ async function createPage(data, context) {
   }
 }
 
-export default async (data, context) => {
+export async function createPage(data, context): Promise<CmsPageRow & CmsPageDescriptionRow> {
   // Make sure the context is either not provided or is an object
   if (context && typeof context !== 'object') {
     throw new Error('Context must be an object');
   }
-  const page = await hookable(createPage, context)(data, context);
+  const page = await hookable(_createPage, context)(data, context);
   return page;
 };
 

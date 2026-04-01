@@ -12,10 +12,11 @@ import {
   getValueSync
 } from '../../../../lib/util/registry.js';
 import { sanitizeRawHtml } from '../../../../lib/util/sanitizeHtml.js';
+import type { CmsPageRow, CmsPageDescriptionRow } from '../../../../types/db/index.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import pageDataSchema from './pageDataSchema.json' with { type: 'json' };
 
-function validatePageDataBeforeInsert(data) {
+function validatePageDataBeforeInsert(data): any {
   const ajv = getAjv();
   pageDataSchema.required = ['status'];
   const jsonSchema = getValueSync('updatePageDataJsonSchema', pageDataSchema, {});
@@ -28,7 +29,7 @@ function validatePageDataBeforeInsert(data) {
   }
 }
 
-async function updatePageData(uuid, data, connection) {
+async function updatePageData(uuid, data, connection): Promise<CmsPageRow & CmsPageDescriptionRow> {
   const query = select().from('cms_page');
   query
     .leftJoin('cms_page_description')
@@ -72,7 +73,7 @@ async function updatePageData(uuid, data, connection) {
  * @param {Object} data
  * @param {Object} context
  */
-async function updatePage(uuid, data, context) {
+async function updatePage(uuid, data, context): Promise<CmsPageRow & CmsPageDescriptionRow> {
   const connection = await getConnection();
   await startTransaction(connection);
   try {
@@ -99,7 +100,7 @@ async function updatePage(uuid, data, context) {
   }
 }
 
-export default async (uuid, data, context) => {
+export default async (uuid, data, context): Promise<CmsPageRow & CmsPageDescriptionRow> => {
   // Make sure the context is either not provided or is an object
   if (context && typeof context !== 'object') {
     throw new Error('Context must be an object');

@@ -1,4 +1,3 @@
-import { CustomerRow } from '@evershop/evershop/types/db/index.js';
 import {
   commit,
   insert,
@@ -22,6 +21,7 @@ import {
   getValue,
   getValueSync
 } from '../../../../lib/util/registry.js';
+import { CustomerRow } from '../../../../types/db/index.js';
 import { getAjv } from '../../../base/services/getAjv.js';
 import customerDataSchema from './customerDataSchema.json' with { type: 'json' };
 

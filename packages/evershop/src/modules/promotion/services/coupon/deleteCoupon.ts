@@ -12,6 +12,7 @@ import {
   hookBefore,
   hookAfter
 } from '../../../../lib/util/hookable.js';
+import type { CouponRow } from '../../../../types/db/index.js';
 import type { CouponData } from './createCoupon.js';
 
 async function deleteCouponData(
@@ -26,7 +27,10 @@ async function deleteCouponData(
  * @param {string} uuid
  * @param {Record<string, any>} context
  */
-async function deleteCoupon(uuid: string, context: Record<string, any>) {
+async function deleteCoupon(
+  uuid: string,
+  context: Record<string, any>
+): Promise<CouponRow> {
   const connection = await getConnection();
   await startTransaction(connection);
   try {
@@ -48,7 +52,10 @@ async function deleteCoupon(uuid: string, context: Record<string, any>) {
   }
 }
 
-export default async (uuid: string, context: Record<string, any> = {}) => {
+export default async (
+  uuid: string,
+  context: Record<string, any> = {}
+): Promise<CouponRow> => {
   // Make sure the context is either not provided or is an object
   if (context && typeof context !== 'object') {
     throw new Error('Context must be an object');

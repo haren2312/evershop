@@ -13,7 +13,6 @@ import {
   hookAfter
 } from '../../../../lib/util/hookable.js';
 import type { CustomerRow } from '../../../../types/db/index.js';
-import { CustomerData } from './createCustomer.js';
 
 async function deleteCustomerData(
   uuid: string,

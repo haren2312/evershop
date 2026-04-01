@@ -6,9 +6,17 @@ import {
   startTransaction
 } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
+import {
+  hookable,
+  hookBefore,
+  hookAfter
+} from '../../../../lib/util/hookable.js';
+import type {
+  CmsPageRow,
+  CmsPageDescriptionRow
+} from '../../../../types/db/index.js';
 
-async function deletePageData(uuid, connection) {
+async function deletePageData(uuid, connection): Promise<void> {
   await del('cms_page').where('uuid', '=', uuid).execute(connection);
 }
 /**
@@ -16,7 +24,10 @@ async function deletePageData(uuid, connection) {
  * @param {String} uuid
  * @param {Object} context
  */
-async function deletePage(uuid, context) {
+const _deletePage = async function deletePage(
+  uuid,
+  context
+): Promise<CmsPageRow & CmsPageDescriptionRow> {
   const connection = await getConnection();
   await startTransaction(connection);
   try {
@@ -43,24 +54,24 @@ async function deletePage(uuid, context) {
     await rollback(connection);
     throw e;
   }
-}
+};
 
-export default async (uuid, context) => {
+export async function deletePage(
+  uuid,
+  context
+): Promise<CmsPageRow & CmsPageDescriptionRow> {
   // Make sure the context is either not provided or is an object
   if (context && typeof context !== 'object') {
     throw new Error('Context must be an object');
   }
-  const page = await hookable(deletePage, context)(uuid, context);
+  const page = await hookable(_deletePage, context)(uuid, context);
   return page;
-};
+}
 
 export function hookBeforeDeletePageData(
   callback: (
     this: Record<string, any>,
-    ...args: [
-    uuid: any,
-    connection: any
-    ]
+    ...args: [uuid: any, connection: any]
   ) => void | Promise<void>,
   priority: number = 10
 ): void {
@@ -70,10 +81,7 @@ export function hookBeforeDeletePageData(
 export function hookAfterDeletePageData(
   callback: (
     this: Record<string, any>,
-    ...args: [
-    uuid: any,
-    connection: any
-    ]
+    ...args: [uuid: any, connection: any]
   ) => void | Promise<void>,
   priority: number = 10
 ): void {
@@ -83,10 +91,7 @@ export function hookAfterDeletePageData(
 export function hookBeforeDeletePage(
   callback: (
     this: Record<string, any>,
-    ...args: [
-    uuid: any,
-    context: any
-    ]
+    ...args: [uuid: any, context: any]
   ) => void | Promise<void>,
   priority: number = 10
 ): void {
@@ -96,10 +101,7 @@ export function hookBeforeDeletePage(
 export function hookAfterDeletePage(
   callback: (
     this: Record<string, any>,
-    ...args: [
-    uuid: any,
-    context: any
-    ]
+    ...args: [uuid: any, context: any]
   ) => void | Promise<void>,
   priority: number = 10
 ): void {

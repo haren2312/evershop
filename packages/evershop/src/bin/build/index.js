@@ -54,7 +54,7 @@ export default async function build() {
     validateConfiguration(config);
   } catch (e) {
     error(e);
-    process.exit(0);
+    process.exit(1);
   }
   process.env.ALLOW_CONFIG_MUTATIONS = false;
 

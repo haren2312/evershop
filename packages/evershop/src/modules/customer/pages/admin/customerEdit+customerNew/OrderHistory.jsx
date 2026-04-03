@@ -1,19 +1,31 @@
-import { Card } from '@components/admin/Card';
+import { Card } from '@components/common/ui/Card';
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 export default function OrderHistory({ customer: { orders = [] } }) {
   return (
     <Card title="Order History">
+      <CardHeader>
+        <CardTitle>Order History</CardTitle>
+        <CardDescription>
+          Recently placed orders by this customer
+        </CardDescription>
+      </CardHeader>
       {orders.length < 1 && (
-        <Card.Session>
+        <CardContent>
           <div>Customer does not have any order yet.</div>
-        </Card.Session>
+        </CardContent>
       )}
       {orders.length > 0 && (
         <>
           {orders.map((order) => (
-            <Card.Session key={order.uuid}>
+            <CardContent key={order.uuid}>
               <div className="flex justify-between items-center gap-2">
                 <div>
                   <a
@@ -36,7 +48,7 @@ export default function OrderHistory({ customer: { orders = [] } }) {
                   <span>{order.grandTotal.text}</span>
                 </div>
               </div>
-            </Card.Session>
+            </CardContent>
           ))}
         </>
       )}

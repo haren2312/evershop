@@ -1,9 +1,8 @@
-import { Card } from '@components/admin/Card.js';
 import Spinner from '@components/admin/Spinner.js';
-import Button from '@components/common/Button.js';
 import { Form } from '@components/common/form/Form.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { ReactSelectField } from '@components/common/form/ReactSelectField.js';
+import { Button } from '@components/common/ui/Button.js';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'urql';
@@ -43,79 +42,89 @@ function ZoneForm({
     query: CountriesQuery
   });
 
-  if (fetching) return <Spinner />;
+  // Reset provinces when country changes
+  React.useEffect(() => {
+    if (countryWatch !== zone?.country?.code) {
+      form.setValue('provinces', []);
+    }
+  }, [countryWatch, zone?.country?.code, form]);
+
+  if (fetching) return <Spinner width={20} height={20} />;
   if (error) {
-    return <p className="text-critical">Error loading countries</p>;
+    return <p className="text-destructive">Error loading countries</p>;
   }
   return (
-    <Card title="Create a shipping zone">
-      <Form
-        id="createShippingZone"
-        method={formMethod || 'POST'}
-        action={saveZoneApi}
-        submitBtn={false}
-        onSuccess={async () => {
-          await reload();
-          onSuccess();
-        }}
-        form={form}
-      >
-        <Card.Session title="Zone name">
-          <InputField
-            name="name"
-            placeholder="Enter zone name"
-            required
-            validation={{ required: 'Zone name is required' }}
-            value={zone?.name}
-          />
-        </Card.Session>
-        <Card.Session title="Country">
-          <ReactSelectField
-            name="country"
-            options={data.countries}
-            hideSelectedOptions={false}
-            isMulti={false}
-            aria-label="Select country"
-            defaultValue={zone?.country?.code}
-          />
-        </Card.Session>
-        <Card.Session title="Provinces/States">
-          <ReactSelectField
-            name="provinces"
-            options={
-              data.countries.find((c) => c.value === countryWatch)?.provinces ||
-              []
-            }
-            hideSelectedOptions
-            isMulti
-            defaultValue={(zone?.provinces || []).map(
-              (province) => province.code
-            )}
-          />
-        </Card.Session>
-        <Card.Session>
-          <div className="flex justify-end gap-2">
-            <Button
-              title="Save"
-              variant="primary"
-              onAction={() => {
-                const form = document.getElementById(
-                  'createShippingZone'
-                ) as HTMLFormElement | null;
-                if (form) {
-                  form.dispatchEvent(
-                    new Event('submit', {
-                      cancelable: true,
-                      bubbles: true
-                    })
-                  );
-                }
-              }}
-            />
-          </div>
-        </Card.Session>
-      </Form>
-    </Card>
+    <Form
+      id="createShippingZone"
+      method={formMethod || 'POST'}
+      action={saveZoneApi}
+      submitBtn={false}
+      onSuccess={async () => {
+        await reload();
+        onSuccess();
+      }}
+      form={form}
+    >
+      <div className="space-y-3">
+        <InputField
+          name="name"
+          label="Zone Name"
+          aria-label="Zone Name"
+          placeholder="Enter zone name"
+          required
+          validation={{ required: 'Zone name is required' }}
+          defaultValue={zone?.name}
+        />
+        <ReactSelectField
+          name="country"
+          label="Country"
+          aria-label="Country"
+          placeholder="Select country"
+          required
+          validation={{ required: 'Country is required' }}
+          options={data.countries}
+          hideSelectedOptions={false}
+          isMulti={false}
+          defaultValue={zone?.country?.code}
+        />
+        <ReactSelectField
+          name="provinces"
+          label="Provinces/States"
+          aria-label="Provinces/States"
+          placeholder="Select provinces/states"
+          options={
+            data.countries.find((c) => c.value === countryWatch)?.provinces ||
+            []
+          }
+          hideSelectedOptions
+          isMulti
+          defaultValue={(zone?.provinces || []).map(
+            (province) => province.code
+          )}
+        />
+        <div className="flex justify-end gap-2">
+          <Button
+            title="Save"
+            variant="default"
+            onClick={() => {
+              const form = document.getElementById(
+                'createShippingZone'
+              ) as HTMLFormElement | null;
+              if (form) {
+                form.dispatchEvent(
+                  new Event('submit', {
+                    cancelable: true,
+                    bubbles: true
+                  })
+                );
+              }
+            }}
+          >
+            Save
+          </Button>
+        </div>
+      </div>
+    </Form>
   );
 }
 

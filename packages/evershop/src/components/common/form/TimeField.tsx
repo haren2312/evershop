@@ -1,12 +1,18 @@
 import { Tooltip } from '@components/common/form/Tooltip.js';
 import { getNestedError } from '@components/common/form/utils/getNestedError.js';
+import { Field, FieldError, FieldLabel } from '@components/common/ui/Field.js';
+import {
+  InputGroup,
+  InputGroupInput
+} from '@components/common/ui/InputGroup.js';
 import { _ } from '@evershop/evershop/lib/locale/translate/_';
 import React from 'react';
 import {
   useFormContext,
   RegisterOptions,
   FieldPath,
-  FieldValues
+  FieldValues,
+  Controller
 } from 'react-hook-form';
 
 interface TimeFieldProps<T extends FieldValues = FieldValues>
@@ -35,7 +41,7 @@ export function TimeField<T extends FieldValues = FieldValues>({
   ...props
 }: TimeFieldProps<T>) {
   const {
-    register,
+    control,
     formState: { errors }
   } = useFormContext<T>();
 
@@ -68,37 +74,46 @@ export function TimeField<T extends FieldValues = FieldValues>({
   };
 
   return (
-    <div className={`form-field ${wrapperClassName}`}>
+    <Field
+      data-invalid={fieldError ? 'true' : 'false'}
+      className={wrapperClassName}
+    >
       {label && (
-        <label htmlFor={fieldId}>
-          {label}
-          {required && <span className="required-indicator">*</span>}
-          {helperText && <Tooltip content={helperText} position="top" />}
-        </label>
+        <FieldLabel htmlFor={fieldId}>
+          <>
+            {label}
+            {required && <span className="text-destructive">*</span>}
+            {helperText && <Tooltip content={helperText} position="top" />}
+          </>
+        </FieldLabel>
       )}
 
-      <input
-        id={fieldId}
-        type="time"
-        min={min}
-        max={max}
-        step={step}
-        {...register(name, validationRules)}
-        className={`${fieldError !== undefined ? 'error' : ''} ${
-          className || ''
-        }`}
-        aria-invalid={fieldError !== undefined ? 'true' : 'false'}
-        aria-describedby={
-          fieldError !== undefined ? `${fieldId}-error` : undefined
-        }
-        {...props}
+      <Controller
+        name={name}
+        control={control}
+        rules={validationRules}
+        render={({ field }) => (
+          <InputGroup>
+            <InputGroupInput
+              {...field}
+              value={field.value ?? ''}
+              id={fieldId}
+              type="time"
+              min={min}
+              max={max}
+              step={step}
+              className={className}
+              aria-invalid={fieldError !== undefined ? 'true' : 'false'}
+              aria-describedby={
+                fieldError !== undefined ? `${fieldId}-error` : undefined
+              }
+              {...props}
+            />
+          </InputGroup>
+        )}
       />
 
-      {fieldError && (
-        <p id={`${fieldId}-error`} className="field-error">
-          {fieldError}
-        </p>
-      )}
-    </div>
+      {fieldError && <FieldError>{fieldError}</FieldError>}
+    </Field>
   );
 }

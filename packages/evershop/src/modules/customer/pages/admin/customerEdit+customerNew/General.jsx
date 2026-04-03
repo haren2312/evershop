@@ -1,15 +1,17 @@
-import { Card } from '@components/admin/Card';
 import Area from '@components/common/Area';
+import { Card } from '@components/common/ui/Card';
+import { CardContent, CardTitle } from '@components/common/ui/Card.js';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 function FullName({ fullName }) {
   return (
-    <Card.Session title="Full Name">
+    <CardContent>
+      <CardTitle className="mb-2">Full Name</CardTitle>
       <div>
         <span>{fullName}</span>
       </div>
-    </Card.Session>
+    </CardContent>
   );
 }
 
@@ -19,11 +21,12 @@ FullName.propTypes = {
 
 function Group({ group }) {
   return (
-    <Card.Session title="Group">
+    <CardContent className="pt-3 border-t border-border">
+      <CardTitle className="mb-2">Group</CardTitle>
       <div>
         <span>{group?.groupName || 'Default'}</span>
       </div>
-    </Card.Session>
+    </CardContent>
   );
 }
 
@@ -35,11 +38,12 @@ Group.propTypes = {
 
 function Email({ email }) {
   return (
-    <Card.Session title="Email">
+    <CardContent className="pt-3 border-t border-border">
+      <CardTitle className="mb-2">Email</CardTitle>
       <div>
         <span>{email}</span>
       </div>
-    </Card.Session>
+    </CardContent>
   );
 }
 
@@ -49,11 +53,12 @@ Email.propTypes = {
 
 function Status({ status }) {
   return (
-    <Card.Session title="Status">
+    <CardContent className="pt-3 border-t border-border">
+      <CardTitle className="mb-2">Status</CardTitle>
       <div>
         <span>{parseInt(status, 10) === 1 ? 'Enabled' : 'Disabled'}</span>
       </div>
-    </Card.Session>
+    </CardContent>
   );
 }
 
@@ -66,6 +71,7 @@ export default function General({ customer }) {
     <Card>
       <Area
         id="customerEditInformation"
+        className="space-y-3"
         coreComponents={[
           {
             component: {

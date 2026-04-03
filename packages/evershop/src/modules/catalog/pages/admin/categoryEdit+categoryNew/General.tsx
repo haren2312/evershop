@@ -1,4 +1,3 @@
-import { Card } from '@components/admin/Card.js';
 import {
   CategoryTree,
   CategoryTreeItem
@@ -6,88 +5,106 @@ import {
 import Area from '@components/common/Area.js';
 import { Editor } from '@components/common/form/Editor.js';
 import { InputField } from '@components/common/form/InputField.js';
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 import './General.scss';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from '@components/common/ui/Dialog.js';
+import { Button } from '@components/common/ui/Button.js';
+import { Label } from '@components/common/ui/Label.js';
+import { useFormContext } from 'react-hook-form';
 
 const ParentCategory: React.FC<{
   parent: CategoryTreeItem;
 }> = ({ parent }) => {
-  const [selecting, setSelecting] = React.useState(false);
+  const { setValue } = useFormContext();
   const [category, setCategory] = React.useState<CategoryTreeItem | null>(
     parent || null
   );
-  const modal = useModal();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+
+  const handleCategoryChange = (newCategory: CategoryTreeItem | null) => {
+    setCategory(newCategory);
+    setValue('parent_id', newCategory?.categoryId || '');
+  };
 
   return (
-    <div className="mt-4 relative">
-      <div className="mb-2">Parent category</div>
-      {category && (
-        <div className="border rounded border-[#c9cccf] mb-2 p-2">
-          {category.path.map((item, index) => (
-            <span key={item.name} className="text-gray-500">
-              {item.name}
-              {index < category.path.length - 1 && ' > '}
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <div className="my-3 space-y-3">
+        <Label>Parent category</Label>
+        {category && (
+          <div className="border rounded border-border mb-2 p-2">
+            {category.path.map((item, index) => (
+              <span key={item.name} className="text-gray-500">
+                {item.name}
+                {index < category.path.length - 1 && ' > '}
+              </span>
+            ))}
+            <span className="text-interactive pl-5 hover:underline">
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setDialogOpen(true);
+                }}
+              >
+                Change
+              </a>
             </span>
-          ))}
-          <span className="text-interactive pl-5 hover:underline">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                modal.open();
-              }}
-            >
-              Change
-            </a>
-          </span>
-          <span className="text-critical pl-5 hover:underline">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setCategory(null);
-              }}
-            >
-              Unlink
-            </a>
-          </span>
-        </div>
-      )}
-      {!selecting && !category && (
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setSelecting(!selecting);
-          }}
-          className="text-interactive"
-        >
-          Select category
-        </a>
-      )}
-      <Modal
-        title="Select a parent category"
-        onClose={modal.close}
-        isOpen={modal.isOpen}
-      >
-        <div className="px-2">
+            <span className="text-destructive pl-5 hover:underline">
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleCategoryChange(null);
+                }}
+              >
+                Unlink
+              </a>
+            </span>
+          </div>
+        )}
+        {!category && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+              e.preventDefault();
+              setDialogOpen(true);
+            }}
+          >
+            Select category
+          </Button>
+        )}
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select Parent Category</DialogTitle>
+          </DialogHeader>
           <CategoryTree
             selectedCategories={category ? [category] : []}
             onSelect={(c) => {
-              setCategory(c);
-              modal.close();
+              handleCategoryChange(c);
+              setDialogOpen(false);
             }}
           />
-        </div>
-      </Modal>
-      <InputField
-        type="hidden"
-        name="parent_id"
-        value={category?.categoryId || ''}
-      />
-    </div>
+        </DialogContent>
+        <InputField
+          type="hidden"
+          name="parent_id"
+          defaultValue={category?.categoryId || ''}
+        />
+      </div>
+    </Dialog>
   );
 };
 
@@ -158,10 +175,16 @@ export default function General({ category }: GeneralProps) {
   ];
 
   return (
-    <Card title="General">
-      <Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>General</CardTitle>
+        <CardDescription>
+          Manage the general information of the category.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <Area id="categoryEditGeneral" coreComponents={fields} />
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

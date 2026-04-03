@@ -1,7 +1,13 @@
-import { Card } from '@components/admin/Card.js';
 import Area from '@components/common/Area.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { TextareaField } from '@components/common/form/TextareaField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface CategorySeoProps {
@@ -72,10 +78,20 @@ export default function Seo({ category }: CategorySeoProps) {
   ];
 
   return (
-    <Card title="Search engine optimize">
-      <Card.Session>
-        <Area id="categoryEditSeo" coreComponents={fields} />
-      </Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>Search engine optimize</CardTitle>
+        <CardDescription>
+          Manage the SEO settings of the category.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Area
+          id="categoryEditSeo"
+          coreComponents={fields}
+          className="space-y-2"
+        />
+      </CardContent>
     </Card>
   );
 }

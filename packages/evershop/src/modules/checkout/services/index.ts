@@ -8,6 +8,20 @@ export * from './toPrice.js';
 export * from './orderCreator.js';
 export * from './orderValidator.js';
 export * from './addShippingAddress.js';
-export { default as removeCartItem } from './removeCartItem.js';
-export { default as updateCartItemQty } from './updateCartItemQty.js';
-export { default as addCartItem } from './addCartItem.js';
+export * from './addBillingAddress.js';
+export * from './checkout.js';
+export {
+  default as removeCartItem,
+  hookBeforeRemoveCartItem,
+  hookAfterRemoveCartItem
+} from './removeCartItem.js';
+export {
+  default as updateCartItemQty,
+  hookBeforeUpdateCartItemQty,
+  hookAfterUpdateCartItemQty
+} from './updateCartItemQty.js';
+export {
+  default as addCartItem,
+  hookBeforeAddCartItem,
+  hookAfterAddCartItem
+} from './addCartItem.js';

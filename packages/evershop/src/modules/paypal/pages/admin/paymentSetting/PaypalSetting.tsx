@@ -1,7 +1,13 @@
-import { Card } from '@components/admin/Card.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { RadioGroupField } from '@components/common/form/RadioGroupField.js';
 import { ToggleField } from '@components/common/form/ToggleField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface PaypalPaymentProps {
@@ -25,8 +31,14 @@ export default function PaypalPayment({
   }
 }: PaypalPaymentProps) {
   return (
-    <Card title="Paypal Payment">
-      <Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>Paypal Payment</CardTitle>
+        <CardDescription>
+          Configure your Paypal payment gateway settings
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Enable?</h4>
@@ -40,38 +52,36 @@ export default function PaypalPayment({
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Dislay Name</h4>
           </div>
           <div className="col-span-2">
             <InputField
-              label="Display Name"
               name="paypalDisplayName"
               placeholder="Display Name"
               defaultValue={paypalDisplayName}
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Client ID</h4>
           </div>
           <div className="col-span-2">
             <InputField
-              label="Client ID"
               name="paypalClientId"
               placeholder="Client ID"
               defaultValue={paypalClientId}
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Client Secret</h4>
@@ -80,20 +90,18 @@ export default function PaypalPayment({
             <InputField
               name="paypalClientSecret"
               placeholder="Secret Key"
-              label="Client Secret"
               defaultValue={paypalClientSecret}
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Environment</h4>
           </div>
           <div className="col-span-2">
             <RadioGroupField
-              label="Environment"
               name="paypalEnvironment"
               defaultValue={paypalEnvironment}
               options={[
@@ -109,8 +117,8 @@ export default function PaypalPayment({
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Payment mode</h4>
@@ -126,7 +134,7 @@ export default function PaypalPayment({
             />
           </div>
         </div>
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

@@ -1,6 +1,12 @@
-import { Card } from '@components/admin/Card.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { ToggleField } from '@components/common/form/ToggleField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface CODPaymentProps {
@@ -13,13 +19,19 @@ export default function CODPayment({
   setting: { codPaymentStatus, codDisplayName }
 }: CODPaymentProps) {
   return (
-    <Card title="Cash On Delivery Payment">
-      <Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>Cash On Delivery Payment</CardTitle>
+        <CardDescription>
+          Configure your Cash On Delivery payment gateway settings
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Enable?</h4>
           </div>
-          <div className="col-span-2">
+          <div className="col-span-2 flex justify-start">
             <ToggleField
               name="codPaymentStatus"
               defaultValue={codPaymentStatus}
@@ -28,8 +40,8 @@ export default function CODPayment({
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Dislay Name</h4>
@@ -42,7 +54,7 @@ export default function CODPayment({
             />
           </div>
         </div>
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

@@ -36,7 +36,7 @@ export default function Index({
 
   if (fetching) return <AddressFormLoadingSkeleton />;
   if (error) {
-    return <p className="text-critical">{error.message}</p>;
+    return <p className="text-destructive">{error.message}</p>;
   }
 
   return (

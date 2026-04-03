@@ -1,12 +1,19 @@
 import { Tooltip } from '@components/common/form/Tooltip.js';
 import { getNestedError } from '@components/common/form/utils/getNestedError.js';
+import { Field, FieldError, FieldLabel } from '@components/common/ui/Field.js';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput
+} from '@components/common/ui/InputGroup.js';
 import { _ } from '@evershop/evershop/lib/locale/translate/_';
 import React from 'react';
 import {
   useFormContext,
   RegisterOptions,
   FieldPath,
-  FieldValues
+  FieldValues,
+  Controller
 } from 'react-hook-form';
 
 interface InputFieldProps<T extends FieldValues = FieldValues>
@@ -34,10 +41,11 @@ export function InputField<T extends FieldValues = FieldValues>({
   type = 'text',
   prefixIcon,
   suffixIcon,
+  defaultValue,
   ...props
 }: InputFieldProps<T>) {
   const {
-    register,
+    control,
     formState: { errors }
   } = useFormContext<T>();
 
@@ -52,62 +60,61 @@ export function InputField<T extends FieldValues = FieldValues>({
       })
   };
 
-  const hasIcons = prefixIcon || suffixIcon;
-  const inputClassName = `${fieldError !== undefined ? 'error' : ''} ${
-    className || ''
-  } ${hasIcons ? '!pr-3' : ''} ${prefixIcon ? '!pl-10' : ''} ${
-    suffixIcon ? '!pr-10' : ''
-  }`.trim();
-
   const renderInput = () => (
-    <input
-      id={fieldId}
-      type={type}
-      {...register(name, validationRules)}
-      className={inputClassName}
-      aria-invalid={fieldError !== undefined ? 'true' : 'false'}
-      aria-describedby={
-        fieldError !== undefined ? `${fieldId}-error` : undefined
-      }
-      {...props}
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={(defaultValue ?? '') as any}
+      rules={validationRules}
+      render={({ field }) => (
+        <InputGroupInput
+          {...field}
+          id={fieldId}
+          type={type}
+          aria-invalid={fieldError !== undefined ? 'true' : 'false'}
+          aria-describedby={
+            fieldError !== undefined ? `${fieldId}-error` : undefined
+          }
+          {...props}
+        />
+      )}
     />
   );
 
+  // Special case: hidden inputs don't need labels or error messages
+  if (type === 'hidden') {
+    return (
+      <div>
+        {renderInput()}
+        {fieldError && <FieldError>{fieldError}</FieldError>}
+      </div>
+    );
+  }
+
   return (
-    <div className={`form-field ${wrapperClassName || ''}`.trim()}>
+    <Field
+      data-invalid={fieldError ? 'true' : 'false'}
+      className={wrapperClassName}
+    >
       {label && (
-        <label htmlFor={fieldId}>
-          {label}
-          {required && <span className="required-indicator">*</span>}
-          {helperText && <Tooltip content={helperText} position="top" />}
-        </label>
+        <FieldLabel htmlFor={fieldId}>
+          <>
+            {label}
+            {required && <span className="text-destructive">*</span>}
+            {helperText && <Tooltip content={helperText} position="top" />}
+          </>
+        </FieldLabel>
       )}
-
-      {hasIcons ? (
-        <div
-          className={`input__wrapper relative flex group items-center`.trim()}
-        >
-          {prefixIcon && (
-            <div className="prefix absolute left-3 z-10 flex items-center justify-center">
-              {prefixIcon}
-            </div>
-          )}
-          {renderInput()}
-          {suffixIcon && (
-            <div className="suffix absolute right-3 z-10 flex items-center justify-center">
-              {suffixIcon}
-            </div>
-          )}
-        </div>
-      ) : (
-        renderInput()
-      )}
-
-      {fieldError && (
-        <p id={`${fieldId}-error`} className="field-error">
-          {fieldError}
-        </p>
-      )}
-    </div>
+      <InputGroup>
+        {renderInput()}
+        {prefixIcon && (
+          <InputGroupAddon align={'inline-start'}>{prefixIcon}</InputGroupAddon>
+        )}
+        {suffixIcon && (
+          <InputGroupAddon align={'inline-end'}>{suffixIcon}</InputGroupAddon>
+        )}
+      </InputGroup>
+      {fieldError && <FieldError>{fieldError}</FieldError>}
+    </Field>
   );
 }

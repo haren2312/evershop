@@ -30,3 +30,4 @@ cypress
 .prettierrc
 mysqlToPostgres.js
 /docs
+extensions

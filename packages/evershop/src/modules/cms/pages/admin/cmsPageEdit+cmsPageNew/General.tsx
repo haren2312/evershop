@@ -1,7 +1,13 @@
-import { Card } from '@components/admin/Card.js';
 import { Editor, Row } from '@components/common/form/Editor.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { RadioGroupField } from '@components/common/form/RadioGroupField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface CmsPageGeneralProps {
@@ -16,9 +22,15 @@ interface CmsPageGeneralProps {
 
 export default function General({ page }: CmsPageGeneralProps) {
   return (
-    <Card title="General">
-      <Card.Session>
-        <div className="space-y-2">
+    <Card>
+      <CardHeader>
+        <CardTitle>General Information</CardTitle>
+        <CardDescription>
+          Provide the basic information for the CMS page.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
           <div>
             <InputField
               id="cms_page_name"
@@ -51,7 +63,7 @@ export default function General({ page }: CmsPageGeneralProps) {
             <Editor name="content" value={page?.content || []} />
           </div>
         </div>
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

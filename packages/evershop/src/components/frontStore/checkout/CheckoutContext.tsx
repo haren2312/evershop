@@ -2,6 +2,7 @@ import {
   useCartState,
   useCartDispatch
 } from '@components/frontStore/cart/CartContext.js';
+import { CreateOrderResult } from '@evershop/evershop/checkout/services';
 import { _ } from '@evershop/evershop/lib/locale/translate/_';
 import { CheckoutData } from '@evershop/evershop/types/checkoutData';
 import { produce } from 'immer';
@@ -11,14 +12,15 @@ import React, {
   useContext,
   ReactNode,
   useCallback,
-  useMemo
+  useMemo,
+  useRef
 } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, FieldValues } from 'react-hook-form';
 
 interface PaymentMethod {
   code: string;
   name: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface PaymentMethodRendererProps {
@@ -38,7 +40,7 @@ interface ShippingMethod {
     value: number;
     text: string;
   };
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface ShippingAddressParams {
@@ -119,12 +121,14 @@ interface CheckoutContextValue extends CheckoutState {
   checkoutSuccessUrl: string;
   loading: boolean; // Computed from loadingStates
   requiresShipment: boolean; // Computed from cart items
-  form: UseFormReturn<any>; // React Hook Form instance
+  form: UseFormReturn<FieldValues>; // React Hook Form instance
 }
 
-interface CheckoutDispatchContextValue {
-  placeOrder: () => Promise<any>;
-  checkout: () => Promise<any>;
+interface CheckoutDispatchContextValue<
+  T extends CreateOrderResult = CreateOrderResult
+> {
+  placeOrder: () => Promise<T>;
+  checkout: () => Promise<T>;
   getPaymentMethods: () => PaymentMethod[];
   getShippingMethods: (
     params?: ShippingAddressParams
@@ -156,7 +160,7 @@ interface CheckoutProviderProps {
   placeOrderApi: string;
   checkoutSuccessUrl: string;
   allowGuestCheckout?: boolean; // Optional, defaults to false
-  form: UseFormReturn<any>; // React Hook Form instance passed from outside
+  form: UseFormReturn<FieldValues>; // React Hook Form instance passed from outside
   enableForm: () => void;
   disableForm: () => void;
 }
@@ -191,6 +195,9 @@ export function CheckoutProvider({
     ...initialState,
     allowGuestCheckout
   });
+
+  // Ref so checkout() always reads the latest checkoutData without needing a re-render.
+  const checkoutDataRef = useRef<CheckoutData>(state.checkoutData);
 
   // Get cart state for computing requiresShipment and cartId
   const cartState = useCartState();
@@ -251,17 +258,24 @@ export function CheckoutProvider({
 
     dispatch({ type: 'SET_PLACING_ORDER', payload: true });
 
-    const response = await retry(() =>
-      fetch(placeOrderApi, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cart_id: cartId })
-      })
-    );
+    let response: Response;
+    try {
+      response = await retry(() =>
+        fetch(placeOrderApi, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cart_id: cartId })
+        })
+      );
+    } catch (error) {
+      dispatch({ type: 'SET_PLACING_ORDER', payload: false });
+      throw error;
+    }
 
     const json = await response.json();
 
-    if (!response.ok) {
+    if (response.ok) {
+      dispatch({ type: 'SET_PLACING_ORDER', payload: false });
       throw new Error(json.error?.message || _('Failed to place order'));
     }
 
@@ -290,21 +304,29 @@ export function CheckoutProvider({
     disableForm();
     dispatch({ type: 'SET_PLACING_ORDER', payload: true });
 
-    const response = await retry(() =>
-      fetch(cartState.data?.checkoutApi, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cart_id: cartId,
-          ...state.checkoutData
+    let response: Response;
+    try {
+      response = await retry(() =>
+        fetch(cartState.data?.checkoutApi, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cart_id: cartId,
+            ...checkoutDataRef.current
+          })
         })
-      })
-    );
+      );
+    } catch (error) {
+      enableForm();
+      dispatch({ type: 'SET_PLACING_ORDER', payload: false });
+      throw error;
+    }
 
     const json = await response.json();
 
     if (!response.ok) {
       enableForm();
+      dispatch({ type: 'SET_PLACING_ORDER', payload: false });
       throw new Error(json.error?.message || _('Failed to checkout'));
     }
 
@@ -314,25 +336,21 @@ export function CheckoutProvider({
     });
 
     return json.data;
-  }, [
-    cartState.data?.checkoutApi,
-    cartId,
-    state.checkoutData,
-    form,
-    enableForm,
-    disableForm
-  ]);
+  }, [cartState.data?.checkoutApi, cartId, form, enableForm, disableForm]);
 
   // Checkout data management
   const setCheckoutData = useCallback((data: CheckoutData) => {
+    checkoutDataRef.current = data;
     dispatch({ type: 'SET_CHECKOUT_DATA', payload: data });
   }, []);
 
   const updateCheckoutData = useCallback((data: Partial<CheckoutData>) => {
+    checkoutDataRef.current = { ...checkoutDataRef.current, ...data };
     dispatch({ type: 'UPDATE_CHECKOUT_DATA', payload: data });
   }, []);
 
   const clearCheckoutData = useCallback(() => {
+    checkoutDataRef.current = {};
     dispatch({ type: 'CLEAR_CHECKOUT_DATA' });
   }, []);
 
@@ -403,14 +421,16 @@ export const useCheckout = (): CheckoutContextValue => {
   return context;
 };
 
-export const useCheckoutDispatch = (): CheckoutDispatchContextValue => {
+export const useCheckoutDispatch = <
+  T extends CreateOrderResult = CreateOrderResult
+>(): CheckoutDispatchContextValue<T> => {
   const context = useContext(CheckoutDispatchContext);
   if (context === undefined) {
     throw new Error(
       'useCheckoutDispatch must be used within a CheckoutProvider'
     );
   }
-  return context;
+  return context as CheckoutDispatchContextValue<T>;
 };
 
 export type {

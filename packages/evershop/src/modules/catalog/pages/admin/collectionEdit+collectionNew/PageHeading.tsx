@@ -10,7 +10,7 @@ export interface CollectionEditPageHeadingProps {
 
 export default function CollectionEditPageHeading({
   backUrl,
-  collection
+  collection = {}
 }: CollectionEditPageHeadingProps) {
   return (
     <div className="w-2/3" style={{ margin: '0 auto' }}>
@@ -23,10 +23,6 @@ export default function CollectionEditPageHeading({
     </div>
   );
 }
-
-CollectionEditPageHeading.defaultProps = {
-  collection: {}
-};
 
 export const layout = {
   areaId: 'content',

@@ -1,0 +1,38 @@
+import { rollback, startTransaction } from '@evershop/postgres-query-builder';
+import { debug } from '../../../../lib/log/logger.js';
+import { getConnection } from '../../../../lib/postgres/connection.js';
+import { INTERNAL_SERVER_ERROR, OK } from '../../../../lib/util/httpStatus.js';
+import { EvershopRequest } from '../../../../types/request.js';
+import { EvershopResponse } from '../../../../types/response.js';
+import createShipment from '../../services/createShipment.js';
+
+export default async (
+  request: EvershopRequest,
+  response: EvershopResponse,
+  next
+) => {
+  const connection = await getConnection();
+  await startTransaction(connection);
+  const { id } = Array.isArray(request.params.id)
+    ? { id: request.params.id[0] }
+    : { id: request.params.id };
+  const { carrier, tracking_number } = request.body;
+  try {
+    const shipment = await createShipment(id, carrier, tracking_number);
+    response.status(OK);
+    response.$body = {
+      data: shipment
+    };
+    next();
+  } catch (e) {
+    debug(e);
+    await rollback(connection);
+    response.status(INTERNAL_SERVER_ERROR);
+    response.json({
+      error: {
+        status: INTERNAL_SERVER_ERROR,
+        message: e.message
+      }
+    });
+  }
+};

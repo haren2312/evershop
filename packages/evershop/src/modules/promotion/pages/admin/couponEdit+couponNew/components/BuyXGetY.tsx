@@ -1,7 +1,21 @@
 import { ProductSelector } from '@components/admin/ProductSelector.js';
 import { NumberField } from '@components/common/form/NumberField.js';
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+  DialogTitle
+} from '@components/common/ui/Dialog.js';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@components/common/ui/Table.js';
 import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
@@ -16,33 +30,28 @@ const SkuSelector: React.FC<{
   product: Product;
   updateProduct: (product: Product) => void;
 }> = ({ product, updateProduct }) => {
-  const modal = useModal();
-
   const onSelect = (sku) => {
     updateProduct({
       ...product,
       sku
     });
-    modal.close();
   };
 
   return (
-    <div>
-      <a
-        href="#"
-        className="text-interactive hover:underline"
-        onClick={(e) => {
-          e.preventDefault();
-          modal.open();
-        }}
-      >
-        {product.sku ? (
-          <span className="italic">&lsquo;{product.sku}&rsquo;</span>
-        ) : (
-          <span>Choose SKU</span>
-        )}
-      </a>
-      <Modal title="Select SKU" onClose={modal.close} isOpen={modal.isOpen}>
+    <Dialog>
+      <DialogTrigger>
+        <Button variant={'link'}>
+          {product.sku ? (
+            <span className="italic">&lsquo;{product.sku}&rsquo;</span>
+          ) : (
+            <span>Choose SKU</span>
+          )}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className={'max-w-[80vw]'}>
+        <DialogHeader>
+          <DialogTitle>Choose Product SKU</DialogTitle>
+        </DialogHeader>
         <ProductSelector
           selectedProducts={[product].map((p) => ({
             sku: p.sku,
@@ -52,8 +61,8 @@ const SkuSelector: React.FC<{
           onSelect={onSelect}
           onUnSelect={() => {}}
         />
-      </Modal>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -109,31 +118,31 @@ const BuyXGetYList: React.FC<{
 
   return (
     <div>
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>
               <span>Sku</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>X</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>Y</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>Max of Y</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>Discount percent</span>
-            </th>
-            <th> </th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+            <TableHead> </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {fields.map((p, i) => (
-            <tr key={p.id}>
-              <td>
+            <TableRow key={p.id}>
+              <TableCell>
                 <SkuSelector
                   product={p}
                   updateProduct={(product) => {
@@ -143,8 +152,8 @@ const BuyXGetYList: React.FC<{
                     });
                   }}
                 />
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <NumberField
                   name={`buyx_gety.${i}.buy_qty`}
                   defaultValue={p.buyQty}
@@ -154,8 +163,8 @@ const BuyXGetYList: React.FC<{
                     required: 'Buy qty is required'
                   }}
                 />
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <NumberField
                   name={`buyx_gety.${i}.get_qty`}
                   defaultValue={p.getQty}
@@ -165,8 +174,8 @@ const BuyXGetYList: React.FC<{
                     required: 'Get qty is required'
                   }}
                 />
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <NumberField
                   name={`buyx_gety.${i}.max_y`}
                   defaultValue={p.maxY}
@@ -176,8 +185,8 @@ const BuyXGetYList: React.FC<{
                     required: 'Max of Y is required'
                   }}
                 />
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <NumberField
                   name={`buyx_gety.${i}.discount`}
                   defaultValue={p.discount}
@@ -188,10 +197,10 @@ const BuyXGetYList: React.FC<{
                   }}
                   unit="%"
                 />
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <a
-                  className="text-critical"
+                  className="text-destructive"
                   href="#"
                   onClick={(e) => {
                     e.preventDefault();
@@ -214,11 +223,11 @@ const BuyXGetYList: React.FC<{
                     />
                   </svg>
                 </a>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       <div className="mt-2 flex justify-start">
         <div className="items-center flex">
           <svg

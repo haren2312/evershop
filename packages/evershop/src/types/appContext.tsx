@@ -1,4 +1,11 @@
+import { WidgetInstance } from '@evershop/evershop/types/widget';
 import { PageMetaInfo } from './pageMeta.js';
+
+type GraphqlScalar = string | number | boolean | null;
+type GraphqlResponseValue =
+  | GraphqlScalar
+  | GraphqlResponseValue[]
+  | { [key: string]: GraphqlResponseValue };
 
 interface Config {
   pageMeta: PageMetaInfo;
@@ -11,12 +18,10 @@ interface Config {
 }
 
 interface AppStateContextValue {
-  graphqlResponse: {
-    [key: string]: any;
-  };
+  graphqlResponse: Record<string, GraphqlResponseValue>;
   config: Config;
   propsMap: Record<string, any[]>;
-  widgets?: any[];
+  widgets?: WidgetInstance[];
   fetching: boolean;
 }
 

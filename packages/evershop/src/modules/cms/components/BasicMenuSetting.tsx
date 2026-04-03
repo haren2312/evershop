@@ -1,9 +1,16 @@
 import Spinner from '@components/admin/Spinner.js';
-import Button from '@components/common/Button.js';
 import { CheckboxField } from '@components/common/form/CheckboxField.js';
 import { InputField } from '@components/common/form/InputField.js';
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+  DialogTitle
+} from '@components/common/ui/Dialog.js';
+import { Input } from '@components/common/ui/Input.js';
+import { Item, ItemContent } from '@components/common/ui/Item.js';
 import {
   DndContext,
   closestCenter,
@@ -25,7 +32,6 @@ import { useFormContext } from 'react-hook-form';
 import CreatableSelect from 'react-select/creatable';
 import uniqid from 'uniqid';
 import { useQuery } from 'urql';
-import { Card } from '../../../components/admin/Card.js';
 import './BasicMenuSetting.scss';
 
 const menuQuery = `
@@ -78,6 +84,7 @@ const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
     transition,
     isDragging
   } = useSortable({ id: item.id });
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -85,7 +92,6 @@ const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
     opacity: isDragging ? 0.5 : 1
   };
 
-  const modal = useModal();
   const [itemInEdit, setItemInEdit] = React.useState(item);
 
   const addChildren = (i) => {
@@ -101,14 +107,14 @@ const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
     } else {
       addChildren(i);
     }
-    modal.close();
+    setDialogOpen(false);
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="flex justify-between py-2 px-2 bg-white border rounded mb-2"
+      className="flex justify-between py-2 px-2 bg-white border border-border rounded mb-2"
     >
       <div className="flex justify-start gap-3 items-center">
         <button
@@ -136,20 +142,19 @@ const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
         <div>{item.name}</div>
       </div>
       <div className="flex justify-end gap-3 items-center">
-        <button
-          type="button"
-          className="text-interactive"
+        <Button
+          variant={'outline'}
           onClick={() => {
             setItemInEdit(item);
-            modal.open();
+            setDialogOpen(true);
           }}
+          size={'sm'}
         >
           Edit
-        </button>
+        </Button>
         {!isChild && (
-          <button
-            type="button"
-            className="text-interactive"
+          <Button
+            variant={'outline'}
             onClick={() => {
               setItemInEdit({
                 id: uniqid(),
@@ -159,27 +164,25 @@ const SortableMenuItem: React.FC<SortableMenuItemProps> = ({
                 uuid: '',
                 children: []
               });
-              modal.open();
+              setDialogOpen(true);
             }}
+            size={'sm'}
           >
             Add child
-          </button>
+          </Button>
         )}
-        <button
-          type="button"
-          className="text-critical"
-          onClick={() => deleteItem(item)}
-        >
+        <Button variant={'destructive'} onClick={() => deleteItem(item)}>
           Delete
-        </button>
+        </Button>
       </div>
-      <Modal
-        title={`Edit Menu Item: ${itemInEdit.name}`}
-        onClose={modal.close}
-        isOpen={modal.isOpen}
-      >
-        <MenuSettingPopup item={itemInEdit} updateItem={updateItemFunc} />
-      </Modal>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{`Edit Menu Item: ${itemInEdit.name}`}</DialogTitle>
+          </DialogHeader>
+          <MenuSettingPopup item={itemInEdit} updateItem={updateItemFunc} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -201,16 +204,20 @@ const MenuSettingPopup: React.FC<{
 
   if (fetching) {
     return (
-      <div className="flex justify-center items-center">
-        <Spinner width={30} height={30} />
-      </div>
+      <Item variant={'outline'}>
+        <ItemContent>
+          <Spinner width={25} height={25} />
+        </ItemContent>
+      </Item>
     );
   }
   if (error) {
     return (
-      <div className="flex justify-center items-center">
-        <p className="text-critical">{error.message}</p>
-      </div>
+      <Item variant={'outline'}>
+        <ItemContent>
+          <div className="text-destructive">{error.message}</div>
+        </ItemContent>
+      </Item>
     );
   }
 
@@ -251,77 +258,69 @@ const MenuSettingPopup: React.FC<{
   };
 
   return (
-    <Card title="Menu item">
-      <Card.Session>
-        <div className="grid grid-flow-row gap-5">
-          <div>
-            <label htmlFor="menuName" className="block mb-2 font-medium">
-              Name
-            </label>
-            <input
-              id="menuName"
-              type="text"
-              value={currentItem.name}
-              onChange={(e) =>
-                setCurrentItem({
-                  ...currentItem,
-                  name: e.target.value
-                })
-              }
-              className="w-full border border-gray-300 rounded-md p-2"
-            />
-          </div>
-          <div>
-            <CreatableSelect
-              isClearable
-              onChange={(newValue: {
-                value: string;
-                label: string;
-                __typename?: string;
-              }) => {
-                setCurrentItem({
-                  ...currentItem,
-                  uuid: newValue?.value || '',
-                  name: newValue?.label || '',
-                  type:
-                    newValue?.__typename === 'Category' ? 'category' : 'page'
-                });
-              }}
-              onCreateOption={handleCreate}
-              options={groupOptions}
-              value={{
-                value: currentItem.uuid,
-                label:
-                  currentItem.type === 'custom'
-                    ? currentItem.uuid
-                    : [
-                        ...groupOptions[0].options,
-                        ...groupOptions[1].options
-                      ].find((option) => option.value === currentItem.uuid)
-                        ?.label || ''
-              }}
-            />
-          </div>
-          {err && <div className="text-critical">{err}</div>}
-          <div className="flex justify-end">
-            <Button
-              title="Save"
-              onAction={() => {
-                if (currentItem.uuid === '') {
-                  setErr('Please select a menu item');
-                  return;
-                }
-                if (currentItem.name === '') {
-                  setErr('Please enter a name');
-                  return;
-                }
-                updateItem(currentItem);
-              }}
-            />
-          </div>
-        </div>
-      </Card.Session>
-    </Card>
+    <div className="grid grid-flow-row gap-5">
+      <div>
+        <Input
+          id="menuName"
+          type="text"
+          value={currentItem.name}
+          placeholder="Menu name"
+          onChange={(e) =>
+            setCurrentItem({
+              ...currentItem,
+              name: e.target.value
+            })
+          }
+          className="w-full "
+        />
+      </div>
+      <div>
+        <CreatableSelect
+          isClearable
+          onChange={(newValue: {
+            value: string;
+            label: string;
+            __typename?: string;
+          }) => {
+            setCurrentItem({
+              ...currentItem,
+              uuid: newValue?.value || '',
+              name: newValue?.label || '',
+              type: newValue?.__typename === 'Category' ? 'category' : 'page'
+            });
+          }}
+          onCreateOption={handleCreate}
+          options={groupOptions}
+          value={{
+            value: currentItem.uuid,
+            label:
+              currentItem.type === 'custom'
+                ? currentItem.uuid
+                : [...groupOptions[0].options, ...groupOptions[1].options].find(
+                    (option) => option.value === currentItem.uuid
+                  )?.label || ''
+          }}
+        />
+      </div>
+      {err && <div className="text-destructive">{err}</div>}
+      <div className="flex justify-end">
+        <Button
+          onClick={() => {
+            if (currentItem.uuid === '') {
+              setErr('Please select a menu item');
+              return;
+            }
+            if (currentItem.name === '') {
+              setErr('Please enter a name');
+              return;
+            }
+            updateItem(currentItem);
+          }}
+        >
+          Save
+        </Button>
+      </div>
+    </div>
   );
 };
 
@@ -338,7 +337,7 @@ export default function BasicMenuSetting({
 }: BasicMenuSettingProps) {
   const { register, setValue } = useFormContext();
   const [items, setItems] = React.useState(menus);
-  const modal = useModal();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -427,114 +426,105 @@ export default function BasicMenuSetting({
 
   return (
     <>
-      <Card.Session title="Menu Items">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={items.map((item) => item.id)}
+          strategy={verticalListSortingStrategy}
         >
-          <SortableContext
-            items={items.map((item) => item.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-2">
-              {items.map((menu) => (
-                <div key={menu.id}>
-                  <SortableMenuItem
-                    item={menu}
-                    updateItem={updateItem}
-                    deleteItem={deleteItem}
-                  />
-                  {menu.children && menu.children.length > 0 && (
-                    <div className="ml-5 mt-2">
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={(event) =>
-                          handleChildDragEnd(event, menu.id)
-                        }
+          <div className="space-y-2">
+            {items.map((menu) => (
+              <div key={menu.id}>
+                <SortableMenuItem
+                  item={menu}
+                  updateItem={updateItem}
+                  deleteItem={deleteItem}
+                />
+                {menu.children && menu.children.length > 0 && (
+                  <div className="ml-5 mt-2">
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={(event) => handleChildDragEnd(event, menu.id)}
+                    >
+                      <SortableContext
+                        items={menu.children.map((child) => child.id)}
+                        strategy={verticalListSortingStrategy}
                       >
-                        <SortableContext
-                          items={menu.children.map((child) => child.id)}
-                          strategy={verticalListSortingStrategy}
-                        >
-                          <div className="space-y-1">
-                            {menu.children.map((child) => (
-                              <SortableMenuItem
-                                key={child.id}
-                                item={child}
-                                updateItem={updateItem}
-                                deleteItem={deleteItem}
-                                isChild={true}
-                              />
-                            ))}
-                          </div>
-                        </SortableContext>
-                      </DndContext>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+                        <div className="space-y-1">
+                          {menu.children.map((child) => (
+                            <SortableMenuItem
+                              key={child.id}
+                              item={child}
+                              updateItem={updateItem}
+                              deleteItem={deleteItem}
+                              isChild={true}
+                            />
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </DndContext>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
-        <input
-          type="hidden"
-          {...register('settings.menus')}
-          value={JSON.stringify(items)}
-        />
+      <input
+        type="hidden"
+        {...register('settings.menus')}
+        value={JSON.stringify(items)}
+      />
+      <div className="space-y-3">
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger>
+            <Button variant={'outline'} size={'sm'}>
+              Add Menu Item
+            </Button>
+          </DialogTrigger>
 
-        <div className="mt-3">
-          <button
-            type="button"
-            className="text-interactive"
-            onClick={() => modal.open()}
-          >
-            Add menu item
-          </button>
-        </div>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Menu Item</DialogTitle>
+            </DialogHeader>
+            <MenuSettingPopup
+              item={{
+                id: uniqid(),
+                name: '',
+                url: '',
+                type: 'category',
+                uuid: '',
+                children: []
+              }}
+              updateItem={(item) => {
+                setItems((prevItems) => [...prevItems, item]);
+                setDialogOpen(false);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
 
-        <Modal
-          title="Create New Menu Item"
-          onClose={modal.close}
-          isOpen={modal.isOpen}
-        >
-          <MenuSettingPopup
-            item={{
-              id: uniqid(),
-              name: '',
-              url: '',
-              type: 'category',
-              uuid: '',
-              children: []
-            }}
-            updateItem={(item) => {
-              setItems((prevItems) => [...prevItems, item]);
-              modal.close();
-            }}
+        <div>
+          <CheckboxField
+            label="Is Main Menu?"
+            name="settings.isMain"
+            defaultValue={isMain}
           />
-        </Modal>
-      </Card.Session>
-      <Card.Session title="Setting">
-        <div className="space-y-2">
-          <div>
-            <CheckboxField
-              label="Is Main Menu?"
-              name="settings.isMain"
-              defaultValue={isMain}
-            />
-          </div>
-          <div>
-            <InputField
-              label="Custom CSS classes"
-              name="settings.className"
-              defaultValue={className}
-              helperText="Custom CSS classes for the menu"
-            />
-          </div>
         </div>
-      </Card.Session>
+        <div>
+          <InputField
+            label="Custom CSS classes"
+            name="settings.className"
+            defaultValue={className}
+            helperText="Custom CSS classes for the menu"
+          />
+        </div>
+      </div>
     </>
   );
 }

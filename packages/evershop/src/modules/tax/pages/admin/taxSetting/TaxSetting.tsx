@@ -1,11 +1,22 @@
-import { Card } from '@components/admin/Card.js';
 import { SettingMenu } from '@components/admin/SettingMenu.js';
 import Spinner from '@components/admin/Spinner.js';
-import Button from '@components/common/Button.js';
 import { Form } from '@components/common/form/Form.js';
 import { SelectField } from '@components/common/form/SelectField.js';
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@components/common/ui/Dialog.js';
 import React from 'react';
 import { useQuery } from 'urql';
 import { TaxClasses } from './components/TaxClasses.js';
@@ -64,7 +75,7 @@ export default function TaxSetting({
   saveSettingApi,
   setting
 }: TaxSettingProps) {
-  const modal = useModal();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   const [countriesQueryData] = useQuery({
     query: CountriesQuery
   });
@@ -82,9 +93,9 @@ export default function TaxSetting({
           </div>
           <div className="col-span-4">
             <Card>
-              <Card.Session>
+              <CardContent>
                 <Spinner width={30} height={30} />
-              </Card.Session>
+              </CardContent>
             </Card>
           </div>
         </div>
@@ -100,13 +111,14 @@ export default function TaxSetting({
         </div>
         <div className="col-span-4 grid grid-cols-1 gap-5">
           <Card>
-            <Card.Session title="Tax">
-              <div>
+            <CardHeader>
+              <CardTitle>Tax calculation configuration</CardTitle>
+              <CardDescription>
                 Configure the tax classes that will be available to your
                 customers at checkout.
-              </div>
-            </Card.Session>
-            <Card.Session title="Basic configuration">
+              </CardDescription>
+            </CardHeader>
+            <CardContent title="Basic configuration">
               <Form
                 id="taxBasicConfig"
                 method="POST"
@@ -118,7 +130,7 @@ export default function TaxSetting({
                     <SelectField
                       name="defaultShippingTaxClassId"
                       label="Shipping tax class"
-                      defaultValue={setting.defaultShippingTaxClassId || ''}
+                      defaultValue={setting.defaultShippingTaxClassId}
                       placeholder="None"
                       options={[
                         {
@@ -164,36 +176,47 @@ export default function TaxSetting({
                   </div>
                 </div>
               </Form>
-            </Card.Session>
+            </CardContent>
           </Card>
           <Card title="Tax classes">
+            <CardHeader>
+              <CardTitle>Tax classes</CardTitle>
+              <CardDescription>
+                Manage tax classes and tax rates for different regions.
+              </CardDescription>
+            </CardHeader>
             <TaxClasses
               classes={taxClassesQueryData.data.taxClasses.items}
               getTaxClasses={reexecuteQuery}
             />
-            <Card.Session>
+            <CardContent>
               <div>
-                <Button
-                  title="Create new tax class"
-                  variant="primary"
-                  onAction={() => modal.open()}
-                />
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger>
+                    <Button
+                      title="Create new tax class"
+                      variant="outline"
+                      onClick={() => setDialogOpen(true)}
+                    >
+                      Create new tax class
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Tax Class</DialogTitle>
+                    </DialogHeader>
+                    <TaxClassForm
+                      saveTaxClassApi={createTaxClassApi}
+                      closeModal={() => setDialogOpen(false)}
+                      getTaxClasses={reexecuteQuery}
+                    />
+                  </DialogContent>
+                </Dialog>
               </div>
-            </Card.Session>
+            </CardContent>
           </Card>
         </div>
       </div>
-      <Modal
-        title={'Create a tax class'}
-        onClose={modal.close}
-        isOpen={modal.isOpen}
-      >
-        <TaxClassForm
-          saveTaxClassApi={createTaxClassApi}
-          closeModal={() => modal.close()}
-          getTaxClasses={reexecuteQuery}
-        />
-      </Modal>
     </div>
   );
 }

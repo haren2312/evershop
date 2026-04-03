@@ -1,6 +1,11 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import { FileBrowser } from '@components/admin/FileBrowser.js';
 import { InputField } from '@components/common/form/InputField.js';
+import { Button } from '@components/common/ui/Button.js';
+import { Checkbox } from '@components/common/ui/Checkbox.js';
+import { Input } from '@components/common/ui/Input.js';
+import { Item, ItemContent, ItemTitle } from '@components/common/ui/Item.js';
+import { Label } from '@components/common/ui/Label.js';
 import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
@@ -189,58 +194,52 @@ export default function SlideshowSetting({
         </div>
       )}
 
-      <div className="bg-white p-4 rounded shadow-sm mb-4">
-        <h2 className="text-lg font-medium mb-4">Slideshow Settings</h2>
+      <Item variant={'outline'}>
+        <ItemContent>
+          <ItemTitle>Slideshow Settings</ItemTitle>
+          <div className="space-y-2 mt-3">
+            <div className="col-span-2 md:col-span-1 space-y-2">
+              <div className="flex items-center mb-4">
+                <Checkbox
+                  id="arrows"
+                  checked={Boolean(currentArrows)}
+                  onCheckedChange={(checked) => {
+                    setValue('settings.arrows', checked);
+                  }}
+                  className="mr-2 h-4 w-4"
+                />
+                <Label htmlFor="arrows">Show Navigation Arrows</Label>
+              </div>
+              <div className="flex justify-start items-center">
+                <Checkbox
+                  id="autoplay"
+                  checked={Boolean(currentAutoplay)}
+                  onCheckedChange={(checked) => {
+                    setValue('settings.autoplay', checked);
+                  }}
+                  className="mr-2 h-4 w-4"
+                />
+                <Label htmlFor="autoplay" className="text-sm">
+                  Enable Autoplay
+                </Label>
+              </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center mb-4">
-              <input
-                type="checkbox"
-                id="autoplay"
-                checked={Boolean(currentAutoplay)}
-                onChange={(e) => {
-                  const isChecked = Boolean(e.target.checked);
-                  setValue('settings.autoplay', isChecked);
-                }}
-                className="mr-2 h-4 w-4"
-              />
-              <label htmlFor="autoplay" className="text-sm">
-                Autoplay Slides
-              </label>
+              {Boolean(currentAutoplay) && (
+                <InputField
+                  type="number"
+                  label="Autoplay Speed (ms)"
+                  name="settings.autoplaySpeed"
+                  defaultValue={Number(autoplaySpeed) || 3000}
+                  placeholder="e.g., 3000 for 3 seconds"
+                  validation={{
+                    min: { value: 1000, message: 'Minimum speed is 1000ms' }
+                  }}
+                />
+              )}
             </div>
 
-            {Boolean(currentAutoplay) && (
-              <InputField
-                type="number"
-                label="Autoplay Speed (ms)"
-                name="settings.autoplaySpeed"
-                defaultValue={Number(autoplaySpeed) || 3000}
-                placeholder="e.g., 3000 for 3 seconds"
-                validation={{
-                  min: { value: 1000, message: 'Minimum speed is 1000ms' }
-                }}
-              />
-            )}
-          </div>
-
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center mb-4">
-              <input
-                type="checkbox"
-                id="arrows"
-                checked={Boolean(currentArrows)}
-                onChange={(e) => {
-                  const isChecked = Boolean(e.target.checked);
-                  setValue('settings.arrows', isChecked);
-                }}
-                className="mr-2 h-4 w-4"
-              />
-              <label htmlFor="arrows" className="text-sm">
-                Show Navigation Arrows
-              </label>
-            </div>
-            {/* <div className="flex items-center">
+            <div className="col-span-2 md:col-span-1">
+              {/* <div className="flex items-center">
               <input
                 type="checkbox"
                 id="dots"
@@ -255,19 +254,16 @@ export default function SlideshowSetting({
                 Show Navigation Dots
               </label>
             </div> */}
+            </div>
           </div>
-        </div>
-      </div>
-      <div className="mb-4">
+        </ItemContent>
+      </Item>
+      <div className="mt-4">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-medium">Slides</h2>
-          <button
-            type="button"
-            onClick={addSlide}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-          >
+          <Button onClick={addSlide} variant={'outline'}>
             Add New Slide
-          </button>
+          </Button>
         </div>
 
         {fields.length > 0 ? (
@@ -276,7 +272,7 @@ export default function SlideshowSetting({
               <div
                 key={slide.id}
                 onClick={() => setActiveSlideIndex(index)}
-                className={`relative border rounded overflow-hidden cursor-pointer ${
+                className={`relative border border-border rounded overflow-hidden cursor-pointer ${
                   activeSlideIndex === index ? 'ring-2 ring-blue-500' : ''
                 }`}
               >
@@ -291,23 +287,20 @@ export default function SlideshowSetting({
                     <div className="text-gray-400">No Image</div>
                   )}
                 </div>
-                <div className="p-2 bg-white border-t">
+                <div className="p-2 bg-white border-t border-border">
                   <p className="text-sm font-medium truncate">
                     {currentSlides[index]?.headline || `Slide ${index + 1}`}
                   </p>
                   <div className="flex mt-2">
-                    <button
-                      type="button"
+                    <Button
+                      variant={'outline'}
+                      size={'sm'}
                       onClick={(e) => {
                         e.stopPropagation();
                         moveUp(index);
                       }}
                       disabled={index === 0}
-                      className={`mr-1 p-1 rounded ${
-                        index === 0
-                          ? 'text-gray-300'
-                          : 'text-gray-500 hover:bg-gray-100'
-                      }`}
+                      className={`mr-1 p-1`}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -322,19 +315,16 @@ export default function SlideshowSetting({
                       >
                         <path d="M18 15l-6-6-6 6" />
                       </svg>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      size={'sm'}
                       onClick={(e) => {
                         e.stopPropagation();
                         moveDown(index);
                       }}
                       disabled={index === fields.length - 1}
-                      className={`mr-1 p-1 rounded ${
-                        index === fields.length - 1
-                          ? 'text-gray-300'
-                          : 'text-gray-500 hover:bg-gray-100'
-                      }`}
+                      className={`mr-1 p-1`}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -349,9 +339,10 @@ export default function SlideshowSetting({
                       >
                         <path d="M6 9l6 6 6-6" />
                       </svg>
-                    </button>
-                    <button
-                      type="button"
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size={'sm'}
                       onClick={(e) => {
                         e.stopPropagation();
                         remove(index);
@@ -364,7 +355,6 @@ export default function SlideshowSetting({
                           setActiveSlideIndex(activeSlideIndex - 1);
                         }
                       }}
-                      className="ml-auto p-1 text-red-500 hover:bg-red-50 rounded"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -381,7 +371,7 @@ export default function SlideshowSetting({
                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                         <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
                       </svg>
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -390,24 +380,19 @@ export default function SlideshowSetting({
         ) : (
           <div className="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
             <p className="text-gray-500 mb-4">No slides have been added yet.</p>
-            <button
-              type="button"
-              onClick={addSlide}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-            >
+            <Button variant="outline" onClick={addSlide}>
               Add Your First Slide
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       {activeSlideIndex !== null && fields[activeSlideIndex] && (
-        <div className="bg-white p-4 rounded shadow-sm">
-          <h3 className="text-lg font-medium mb-4">
+        <div className="bg-white p-4 rounded border border-border">
+          <h3 className="text-sm font-normal mb-4">
             Edit Slide {activeSlideIndex + 1}
           </h3>
-
-          <div className="mb-4 border rounded overflow-hidden">
+          <div className="mb-2 border border-border rounded overflow-hidden">
             <div className="aspect-[16/9] bg-gray-100 relative">
               {currentSlides[activeSlideIndex]?.image ? (
                 <div className="relative w-full h-full">
@@ -434,7 +419,7 @@ export default function SlideshowSetting({
                       }
                     }}
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-20 flex flex-col items-center justify-center p-4 text-center">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
                     {currentSlides[activeSlideIndex]?.headline && (
                       <h3 className="text-white text-xl md:text-2xl font-bold mb-2">
                         {currentSlides[activeSlideIndex].headline}
@@ -462,28 +447,26 @@ export default function SlideshowSetting({
                 </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <button
-                    type="button"
+                  <Button
+                    variant="outline"
                     onClick={() => setOpenFileBrowser(true)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
                   >
                     Select Image
-                  </button>
+                  </Button>
                 </div>
               )}
 
               {currentSlides[activeSlideIndex]?.image && (
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
                   onClick={() => setOpenFileBrowser(true)}
-                  className="absolute bottom-2 right-2 bg-white p-2 rounded shadow hover:bg-gray-100"
+                  className="absolute bottom-2 right-2"
                 >
                   Change Image
-                </button>
+                </Button>
               )}
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
               type="hidden"
@@ -624,11 +607,10 @@ export default function SlideshowSetting({
                     };
                     setValue('settings.slides', newSlides);
                   }}
-                  className="w-10 h-10 rounded mr-2 cursor-pointer"
+                  className="w-10 h-10 rounded border-border mr-2 cursor-pointer"
                 />
-                <input
+                <Input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded"
                   value={
                     currentSlides[activeSlideIndex]?.buttonColor || '#3B82F6'
                   }

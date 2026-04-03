@@ -118,7 +118,7 @@ export const getAvailableShippingMethods = async (
         }
         return {
           ...method,
-          cost: toPrice(jsonResponse.data.data.cost, true)
+          cost: toPrice(jsonResponse.data.data.cost, false)
         };
       } else if (method.weight_based_cost) {
         const totalWeight = cart.total_weight;

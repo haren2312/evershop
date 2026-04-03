@@ -96,11 +96,14 @@ export default async (request, response, next) => {
     });
   } catch (e) {
     await rollback(connection);
+
     response.status(INTERNAL_SERVER_ERROR);
     response.json({
       error: {
         status: INTERNAL_SERVER_ERROR,
-        message: e.message
+        message: e.message.includes('METHOD_ZONE_UNIQUE')
+          ? 'This shipping method is already added to this zone'
+          : e.message
       }
     });
   }

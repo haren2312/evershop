@@ -1,5 +1,5 @@
 import { NavigationItem } from '@components/admin/NavigationItem.js';
-import { GiftIcon } from '@heroicons/react/24/solid';
+import { Gift } from 'lucide-react';
 import React from 'react';
 
 interface CouponsMenuItemProps {
@@ -7,5 +7,5 @@ interface CouponsMenuItemProps {
 }
 
 export default function CouponsMenuItem({ url }: CouponsMenuItemProps) {
-  return <NavigationItem Icon={GiftIcon} title="Coupons" url={url} />;
+  return <NavigationItem Icon={Gift} title="Coupons" url={url} />;
 }

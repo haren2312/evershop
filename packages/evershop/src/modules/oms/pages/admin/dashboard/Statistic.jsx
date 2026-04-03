@@ -1,4 +1,11 @@
-import { Card } from '@components/admin/Card';
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardContent
+} from '@components/common/ui/Card.js';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -11,6 +18,8 @@ import {
   YAxis
 } from 'recharts';
 import './Statistic.scss';
+import { ButtonGroup } from '@components/common/ui/ButtonGroup.js';
+import { Button } from '@components/common/ui/Button.js';
 
 export default function SaleStatistic({ api }) {
   const [data, setData] = useState([]);
@@ -39,6 +48,12 @@ export default function SaleStatistic({ api }) {
   if (fetching) {
     return (
       <Card title="Sale Statistics">
+        <CardHeader>
+          <CardTitle>Sale Statistics</CardTitle>
+          <CardDescription>
+            Overview of sales data over selected periods
+          </CardDescription>
+        </CardHeader>
         <div className="skeleton-wrapper-statistic">
           <div className="skeleton" />
         </div>
@@ -46,24 +61,39 @@ export default function SaleStatistic({ api }) {
     );
   } else {
     return (
-      <Card
-        title="Sale Statistics"
-        actions={[
-          {
-            name: 'Daily',
-            onAction: () => setPeriod('daily')
-          },
-          {
-            name: 'Weekly',
-            onAction: () => setPeriod('weekly')
-          },
-          {
-            name: 'Monthly',
-            onAction: () => setPeriod('monthly')
-          }
-        ]}
-      >
-        <Card.Session>
+      <Card>
+        <CardHeader>
+          <CardTitle>Sale Statistics</CardTitle>
+          <CardDescription>
+            Overview of sales data over selected periods
+          </CardDescription>
+          <CardAction>
+            <ButtonGroup>
+              <Button onClick={() => setPeriod('daily')} variant={'outline'}>
+                {period === 'daily' ? (
+                  <span className="text-primary">Daily</span>
+                ) : (
+                  'Daily'
+                )}
+              </Button>
+              <Button onClick={() => setPeriod('weekly')} variant={'outline'}>
+                {period === 'weekly' ? (
+                  <span className="text-primary">Weekly</span>
+                ) : (
+                  'Weekly'
+                )}
+              </Button>
+              <Button onClick={() => setPeriod('monthly')} variant={'outline'}>
+                {period === 'monthly' ? (
+                  <span className="text-primary">Monthly</span>
+                ) : (
+                  'Monthly'
+                )}
+              </Button>
+            </ButtonGroup>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
           {data.length === 0 ? null : (
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart
@@ -95,7 +125,7 @@ export default function SaleStatistic({ api }) {
               </AreaChart>
             </ResponsiveContainer>
           )}
-        </Card.Session>
+        </CardContent>
       </Card>
     );
   }

@@ -1,4 +1,5 @@
-import { Dot } from '@components/admin/Dot.js';
+import { Badge } from '@components/common/ui/Badge.js';
+import { TableCell } from '@components/common/ui/Table.js';
 import React from 'react';
 
 export interface StatusProps {
@@ -6,11 +7,11 @@ export interface StatusProps {
 }
 export function Status({ status }: StatusProps) {
   return (
-    <td>
+    <TableCell>
       <div>
-        {status === 0 && <Dot variant="default" size="1rem" />}
-        {status === 1 && <Dot variant="success" size="1rem" />}
+        {status === 0 && <Badge variant="destructive">Inactive</Badge>}
+        {status === 1 && <Badge variant="success">Active</Badge>}
       </div>
-    </td>
+    </TableCell>
   );
 }

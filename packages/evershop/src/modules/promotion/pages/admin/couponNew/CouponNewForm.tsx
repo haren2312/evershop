@@ -1,7 +1,13 @@
-import { Card } from '@components/admin/Card.js';
 import { FormButtons } from '@components/admin/FormButtons.js';
 import Area from '@components/common/Area.js';
 import { Form } from '@components/common/form/Form.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 import { toast } from 'react-toastify';
 
@@ -25,29 +31,55 @@ export default function CouponNewForm({ action, gridUrl }: CouponNewFormProps) {
       submitBtn={false}
     >
       <div className="grid grid-cols-1 gap-5">
-        <Card title="General">
-          <Card.Session>
+        <Card>
+          <CardHeader>
+            <CardTitle>General Information</CardTitle>
+            <CardDescription>
+              The general information about the coupon.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
             <Area id="couponEditGeneral" noOuter />
-          </Card.Session>
+          </CardContent>
         </Card>
-        <Card title="Discount Type">
-          <Card.Session>
+        <Card>
+          <CardHeader>
+            <CardTitle>Discount Type</CardTitle>
+            <CardDescription>
+              The type of discount applied by the coupon.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
             <Area id="couponEditDiscountType" noOuter />
-          </Card.Session>
+          </CardContent>
         </Card>
         <div className="grid grid-cols-3 gap-x-5 grid-flow-row ">
           <div className="col-span-2 grid grid-cols-1 gap-5 auto-rows-max">
-            <Card title="Order conditions">
-              <Card.Session>
+            <Card>
+              <CardHeader>
+                <CardTitle>Order conditions</CardTitle>
+                <CardDescription>
+                  The conditions related to the order for the coupon to be
+                  applied.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <Area id="couponEditLeft" noOuter className="col-8" />
-              </Card.Session>
+              </CardContent>
             </Card>
           </div>
           <div className="col-span-1 grid grid-cols-1 gap-5 auto-rows-max">
-            <Card title="Customer conditions">
-              <Card.Session>
+            <Card>
+              <CardHeader>
+                <CardTitle>Customer conditions</CardTitle>
+                <CardDescription>
+                  The conditions related to the customer for the coupon to be
+                  applied.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <Area id="couponEditRight" className="col-4" noOuter />
-              </Card.Session>
+              </CardContent>
             </Card>
           </div>
         </div>

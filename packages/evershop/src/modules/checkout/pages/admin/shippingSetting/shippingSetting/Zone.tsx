@@ -1,8 +1,13 @@
-import { Card } from '@components/admin/Card.js';
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
-import { MapPinIcon } from '@heroicons/react/24/solid';
+import { CardContent } from '@components/common/ui/Card.js';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger,
+  DialogTitle
+} from '@components/common/ui/Dialog.js';
 import axios from 'axios';
+import { MapPin } from 'lucide-react';
 import React from 'react';
 import { toast } from 'react-toastify';
 import { ShippingMethod } from './Method.js';
@@ -32,60 +37,62 @@ export interface ZoneProps {
 }
 
 function Zone({ zone, reload }: ZoneProps) {
-  const modal = useModal();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   return (
-    <Card.Session
-      title={
-        <div className="flex justify-between items-center gap-5">
-          <div>{zone.name}</div>
-          <div className="flex justify-between gap-5">
-            <a
-              href="#"
-              className="text-interactive"
-              onClick={(e) => {
-                e.preventDefault();
-                modal.open();
-              }}
-            >
-              Edit Zone
-            </a>
-            <a
-              className="text-critical"
-              href="#"
-              onClick={async (e) => {
-                e.preventDefault();
-                try {
-                  const response = await axios.delete(zone.deleteApi);
-                  if (response.status === 200) {
-                    // Toast success
-                    toast.success('Zone removed successfully');
-                    // Delay for 2 seconds
-                    setTimeout(() => {
-                      // Reload page
-                      window.location.reload();
-                    }, 1500);
-                  } else {
-                    // Toast error
-                    toast.error('Failed to remove zone');
-                  }
-                } catch (error) {
+    <CardContent className="space-y-3 pt-3 border-t border-border">
+      <div className="flex justify-between items-center gap-5">
+        <div className="text-xs uppercase font-semibold">{zone.name}</div>
+        <div className="flex justify-between gap-5">
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger>Edit Zone</DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Shipping Zone</DialogTitle>
+              </DialogHeader>
+              <ZoneForm
+                formMethod="PATCH"
+                saveZoneApi={zone.updateApi}
+                onSuccess={() => setDialogOpen(false)}
+                reload={reload}
+                zone={zone}
+              />
+            </DialogContent>
+          </Dialog>
+          <a
+            className="text-destructive"
+            href="#"
+            onClick={async (e) => {
+              e.preventDefault();
+              try {
+                const response = await axios.delete(zone.deleteApi);
+                if (response.status === 200) {
+                  // Toast success
+                  toast.success('Zone removed successfully');
+                  // Delay for 2 seconds
+                  setTimeout(() => {
+                    // Reload page
+                    window.location.reload();
+                  }, 1500);
+                } else {
                   // Toast error
                   toast.error('Failed to remove zone');
                 }
-              }}
-            >
-              Remove Zone
-            </a>
-          </div>
+              } catch (error) {
+                // Toast error
+                toast.error('Failed to remove zone');
+              }
+            }}
+          >
+            Remove Zone
+          </a>
         </div>
-      }
-    >
+      </div>
       <div className="divide-y border rounded border-divider">
-        <div className="flex justify-start items-center border-divider mt-5">
+        <div className="flex justify-start items-center border-divider">
           <div className="p-5">
-            <MapPinIcon width={25} height={25} fill="#008060" />
+            <MapPin width={20} height={20} />
           </div>
-          <div className="flex-grow px-2">
+          <div className="grow px-2">
             <div>
               <b>{zone.country?.name || 'Worldwide'}</b>
             </div>
@@ -98,8 +105,8 @@ function Zone({ zone, reload }: ZoneProps) {
             </div>
           </div>
         </div>
-        <div className="flex justify-start items-center border-divider mt-5">
-          <div className="flex-grow px-2">
+        <div className="flex justify-start items-center border-divider">
+          <div className="grow px-2">
             <Methods
               methods={zone.methods}
               reload={reload}
@@ -108,20 +115,7 @@ function Zone({ zone, reload }: ZoneProps) {
           </div>
         </div>
       </div>
-      <Modal
-        title={`Edit Zone: ${zone.name}`}
-        onClose={modal.close}
-        isOpen={modal.isOpen}
-      >
-        <ZoneForm
-          formMethod="PATCH"
-          saveZoneApi={zone.updateApi}
-          onSuccess={() => modal.close()}
-          reload={reload}
-          zone={zone}
-        />
-      </Modal>
-    </Card.Session>
+    </CardContent>
   );
 }
 

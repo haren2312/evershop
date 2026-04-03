@@ -1,10 +1,10 @@
-import { Card } from '@components/admin/Card.js';
-import Button from '@components/common/Button.js';
 import { Form } from '@components/common/form/Form.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { NumberField } from '@components/common/form/NumberField.js';
 import { useAlertContext } from '@components/common/modal/Alert.js';
 import RenderIfTrue from '@components/common/RenderIfTrue.js';
+import { Button } from '@components/common/ui/Button.js';
+import { CardContent } from '@components/common/ui/Card.js';
 import React from 'react';
 import { toast } from 'react-toastify';
 
@@ -27,19 +27,21 @@ export default function StripeRefundButton({
   order: { paymentStatus, orderId, paymentMethod, grandTotal }
 }: StripeRefundButtonProps) {
   const { openAlert, closeAlert, dispatchAlert } = useAlertContext();
+  const [loading, setLoading] = React.useState(false);
   return (
     <RenderIfTrue
       condition={
         paymentMethod === 'stripe' &&
-        ['paid', 'partial_refunded'].includes(paymentStatus.code)
+        ['stripe_captured', 'stripe_partial_refunded'].includes(
+          paymentStatus.code
+        )
       }
     >
-      <Card.Session>
+      <CardContent>
         <div className="flex justify-end">
           <Button
-            title="Refund"
-            variant="secondary"
-            onAction={() => {
+            variant="destructive"
+            onClick={() => {
               openAlert({
                 heading: 'Refund',
                 content: (
@@ -50,6 +52,7 @@ export default function StripeRefundButton({
                       action={refundAPI}
                       submitBtn={false}
                       onSuccess={(response) => {
+                        setLoading(false);
                         if (response.error) {
                           toast.error(response.error.message);
                           dispatchAlert({
@@ -62,6 +65,7 @@ export default function StripeRefundButton({
                         }
                       }}
                       onInvalid={() => {
+                        setLoading(false);
                         dispatchAlert({
                           type: 'update',
                           payload: { secondaryAction: { isLoading: false } }
@@ -94,7 +98,7 @@ export default function StripeRefundButton({
                       <InputField
                         type="hidden"
                         name="order_id"
-                        value={orderId}
+                        defaultValue={orderId}
                       />
                     </Form>
                   </div>
@@ -107,6 +111,7 @@ export default function StripeRefundButton({
                 secondaryAction: {
                   title: 'Refund',
                   onAction: () => {
+                    setLoading(true);
                     dispatchAlert({
                       type: 'update',
                       payload: { secondaryAction: { isLoading: true } }
@@ -117,14 +122,16 @@ export default function StripeRefundButton({
                       new Event('submit', { cancelable: true, bubbles: true })
                     );
                   },
-                  variant: 'primary',
-                  isLoading: false
+                  variant: 'secondary',
+                  isLoading: loading
                 }
               });
             }}
-          />
+          >
+            Refund
+          </Button>
         </div>
-      </Card.Session>
+      </CardContent>
     </RenderIfTrue>
   );
 }

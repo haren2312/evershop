@@ -14,4 +14,7 @@ export interface WidgetInstance<T = any> extends Widget<T> {
   id: string;
   type: string;
   settings: Record<string, T>;
+  props: Record<string, any>;
+  areaId: string[];
+  sortOrder: number;
 }

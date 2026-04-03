@@ -1,5 +1,10 @@
-import { Card } from '@components/admin/Card';
-import { Dot } from '@components/admin/Dot.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { toast } from 'react-toastify';
@@ -7,6 +12,22 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import './Lifetimesales.scss';
 
 const COLORS = ['#aee9d1', '#fed3d1', '#a4e8f2'];
+
+const Dot = ({ variant }) => {
+  let bgColor = 'bg-gray-400';
+  if (variant === 'info') {
+    bgColor = 'bg-blue-400';
+  } else if (variant === 'success') {
+    bgColor = 'bg-green-400';
+  } else if (variant === 'critical') {
+    bgColor = 'bg-red-400';
+  }
+  return <span className={`w-3 h-3 rounded-full ${bgColor} inline-block`} />;
+};
+
+Dot.propTypes = {
+  variant: PropTypes.oneOf(['info', 'success', 'critical'])
+};
 
 export default function LifetimeSale({ api }) {
   const [data, setData] = React.useState({});
@@ -44,25 +65,34 @@ export default function LifetimeSale({ api }) {
   if (fetching) {
     return (
       <Card title="Lifetime Sales">
-        <Card.Session>
+        <CardHeader>
+          <CardTitle>Lifetime Sales</CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="skeleton-wrapper-lifetime">
             <div className="skeleton" />
             <div className="skeleton" />
             <div className="skeleton" />
             <div className="skeleton" />
           </div>
-        </Card.Session>
-        <Card.Session>
+        </CardContent>
+        <CardContent>
           <div className="skeleton-wrapper-lifetime">
             <div className="skeleton-chart" />
           </div>
-        </Card.Session>
+        </CardContent>
       </Card>
     );
   } else {
     return (
       <Card title="Lifetime Sales">
-        <Card.Session>
+        <CardHeader>
+          <CardTitle>Lifetime Sales</CardTitle>
+          <CardDescription>
+            Overview of total sales and order status over the lifetime of your
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <div className="grid grid-cols-1 gap-2">
             <div className="flex space-x-2 items-center">
               <Dot variant="info" />
@@ -85,8 +115,8 @@ export default function LifetimeSale({ api }) {
               </div>
             </div>
           </div>
-        </Card.Session>
-        <Card.Session>
+        </CardContent>
+        <CardContent>
           <div style={{ height: '200px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -107,7 +137,7 @@ export default function LifetimeSale({ api }) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </Card.Session>
+        </CardContent>
       </Card>
     );
   }

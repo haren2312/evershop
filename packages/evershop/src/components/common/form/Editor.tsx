@@ -1,7 +1,9 @@
 import { FileBrowser } from '@components/admin/FileBrowser.js';
 import { getColumnClasses } from '@components/common/form/editor/GetColumnClasses.js';
 import { getRowClasses } from '@components/common/form/editor/GetRowClasses.js';
+import { RawToolWrapper } from '@components/common/form/editor/RawToolWrapper.js';
 import { RowTemplates } from '@components/common/form/editor/RowTemplates.js';
+import { Field, FieldLabel } from '@components/common/ui/Field.js';
 import {
   DndContext,
   closestCenter,
@@ -17,7 +19,7 @@ import {
   useSortable,
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { XCircleIcon } from '@heroicons/react/24/outline';
+import { CircleX } from 'lucide-react';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
@@ -48,10 +50,11 @@ async function loadEditorJSQuote(): Promise<any> {
   return Quote;
 }
 
-async function loadEditorJSRaw(): Promise<any> {
-  const { default: RawTool } = await import('@editorjs/raw');
-  return RawTool;
-}
+// Using custom RawToolWrapper instead to fix backspace issues
+// async function loadEditorJSRaw(): Promise<any> {
+//   const { default: RawTool } = await import('@editorjs/raw');
+//   return RawTool;
+// }
 
 const SortableRow: React.FC<{
   row: Row;
@@ -73,18 +76,17 @@ const SortableRow: React.FC<{
     transform: transform ? `translateY(${transform.y}px)` : undefined,
     transition,
     opacity: isDragging ? 0.5 : 1,
-    position: 'relative',
-    zIndex: isDragging ? 1 : 0
+    position: 'relative'
   } as React.CSSProperties;
 
   return (
     <div
-      className="border row__container mt-5"
+      className="border border-border row__container mt-3 first:mt-0 rounded-md"
       id={row.id}
       ref={setNodeRef}
       style={style}
     >
-      <div className="config p-3 flex justify-between bg-[#cccccc] items-center">
+      <div className="config p-3 flex justify-between bg-muted items-center">
         <div className="drag__icon cursor-move" {...attributes} {...listeners}>
           <svg
             viewBox="0 0 24 24"
@@ -110,7 +112,7 @@ const SortableRow: React.FC<{
               removeRow(row.id);
             }}
           >
-            <XCircleIcon color="#d72c0d" width={20} height={20} />
+            <CircleX width={20} height={20} />
           </a>
         </div>
       </div>
@@ -198,7 +200,7 @@ export const Editor: React.FC<EditorProps> = ({ name, value = [], label }) => {
       const Header = await loadEditorJSHeader();
       const List = await loadEditorJSList();
       const Quote = await loadEditorJSQuote();
-      const RawTool = await loadEditorJSRaw();
+      // Using RawToolWrapper instead of loading from @editorjs/raw
       setValue(name, rows);
       rows.forEach((row) => {
         row.columns.forEach((column) => {
@@ -211,7 +213,10 @@ export const Editor: React.FC<EditorProps> = ({ name, value = [], label }) => {
               tools: {
                 header: Header,
                 list: List,
-                raw: RawTool,
+                raw: {
+                  class: RawToolWrapper,
+                  inlineToolbar: false
+                },
                 quote: Quote,
                 image: {
                   class: ImageTool,
@@ -266,8 +271,8 @@ export const Editor: React.FC<EditorProps> = ({ name, value = [], label }) => {
   };
 
   return (
-    <div className="editor form-field-container">
-      <label htmlFor="description mt-4">{label}</label>
+    <Field className="editor form-field-container">
+      <FieldLabel htmlFor="description mt-4">{label}</FieldLabel>
       <div className="prose prose-xl max-w-none">
         <DndContext
           sensors={sensors}
@@ -319,6 +324,6 @@ export const Editor: React.FC<EditorProps> = ({ name, value = [], label }) => {
           isMultiple={false}
         />
       )}
-    </div>
+    </Field>
   );
 };

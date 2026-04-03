@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/img-redundant-alt */
 import { FileBrowser } from '@components/admin/FileBrowser.js';
 import { InputField } from '@components/common/form/InputField.js';
+import { Button } from '@components/common/ui/Button.js';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -53,7 +54,7 @@ export default function BannerSetting({
     }
   }, [image]);
   return (
-    <div className={`banner-widget`}>
+    <div className={`banner-widget space-y-3`}>
       <div className="max-h-96">
         {openFileBrowser && (
           <FileBrowser
@@ -119,13 +120,16 @@ export default function BannerSetting({
           )}
         </div>
 
-        <a
-          href="#"
-          onClick={() => setOpenFileBrowser(true)}
-          className="absolute bottom-2 right-2 bg-white p-2 border border-gray-300 shadow-sm hover:bg-gray-50 z-10"
+        <Button
+          variant="outline"
+          onClick={(e) => {
+            e.preventDefault();
+            setOpenFileBrowser(true);
+          }}
+          className="absolute bottom-2 right-2 z-10"
         >
           Select Image
-        </a>
+        </Button>
       </div>
 
       <InputField

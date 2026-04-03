@@ -1,4 +1,4 @@
-import { hookable } from '../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../lib/util/hookable.js';
 import { CheckoutData } from '../../../types/checkoutData.js';
 import { addBillingAddress } from './addBillingAddress.js';
 import { addShippingAddress } from './addShippingAddress.js';
@@ -6,7 +6,7 @@ import { getCartByUUID } from './getCartByUUID.js';
 import { createOrder } from './orderCreator.js';
 import { saveCart } from './saveCart.js';
 
-async function checkoutService(
+const _checkout = async function checkout(
   cartId: string,
   data: CheckoutData,
   context: Record<string, unknown> = {}
@@ -66,21 +66,49 @@ async function checkoutService(
   await saveCart(cart);
   const order = await createOrder(cart);
   return order;
-}
+};
 
 /**
  * Hookable wrapper for the checkout service.
  * This allows third-party extensions to hook before or after the checkout process.
  */
-export const checkout = async (
+export async function checkout(
   cartId: string,
   data: CheckoutData,
   context: Record<string, unknown> = {}
-) => {
-  const result = await hookable(checkoutService, {
+) {
+  const result = await hookable(_checkout, {
     cartId,
     data,
     ...context
   })(cartId, data, context);
   return result;
-};
+}
+
+export function hookBeforeCheckout(
+  callback: (
+    this: { cartId: string; data: CheckoutData; [key: string]: unknown },
+    ...args: [
+      cartId: string,
+      data: CheckoutData,
+      context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('checkout', callback, priority);
+}
+
+export function hookAfterCheckout(
+  callback: (
+    this: { cartId: string; data: CheckoutData; [key: string]: unknown },
+    ...args: [
+      cartId: string,
+      data: CheckoutData,
+      context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('checkout', callback, priority);
+}

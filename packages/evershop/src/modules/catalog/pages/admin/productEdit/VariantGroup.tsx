@@ -1,4 +1,9 @@
-import { Card } from '@components/admin/Card.js';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 import { New } from './variants/New.js';
 import { Variants } from './variants/Variants.js';
@@ -40,7 +45,13 @@ const VariantGroup: React.FC<VariantGroupProps> = ({
     product?.variantGroup || null
   );
   return (
-    <Card title="Variant">
+    <Card>
+      <CardHeader>
+        <CardTitle>Variant Group</CardTitle>
+        <CardDescription>
+          Manage the variant group of the product.
+        </CardDescription>
+      </CardHeader>
       {!group && (
         <New
           currentProductUuid={product.uuid}

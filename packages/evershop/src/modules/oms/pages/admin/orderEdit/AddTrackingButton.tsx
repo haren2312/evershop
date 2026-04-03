@@ -1,14 +1,22 @@
-import Button from '@components/common/Button.js';
 import { Form } from '@components/common/form/Form.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { SelectField } from '@components/common/form/SelectField.js';
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@components/common/ui/Dialog.js';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
 interface AddTrackingButtonProps {
   order: {
+    noShippingRequired: boolean;
     shipment: {
       carrier: string;
       trackingNumber: string;
@@ -22,90 +30,104 @@ interface AddTrackingButtonProps {
   }[];
 }
 export default function AddTrackingButton({
-  order: { shipment },
+  order: { noShippingRequired, shipment },
   carriers
 }: AddTrackingButtonProps) {
-  const modal = useModal();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   const form = useForm();
-  if (!shipment) {
+  if (noShippingRequired || !shipment) {
     return null;
   } else {
     return (
       <>
-        <Button
-          title="Edit Tracking Info"
-          variant="primary"
-          onAction={() => {
-            modal.open();
-          }}
-        />
-        <Modal
-          title="Edit Tracking Information"
-          onClose={modal.close}
-          isOpen={modal.isOpen}
-        >
-          <Form
-            form={form}
-            id="editTrackingInfo"
-            method="PATCH"
-            action={shipment.updateShipmentApi}
-            submitBtn={false}
-            onSuccess={() => {
-              location.reload();
-            }}
-          >
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <InputField
-                  type="text"
-                  name="tracking_number"
-                  label="Tracking number"
-                  placeholder="Tracking number"
-                  defaultValue={shipment.trackingNumber || ''}
-                  required
-                  validation={{
-                    required: 'Tracking number is required'
-                  }}
-                />
-              </div>
-              <div>
-                <SelectField
-                  name="carrier"
-                  label="Carrier"
-                  defaultValue={shipment.carrier || ''}
-                  required
-                  options={carriers}
-                  validation={{
-                    required: 'Carrier is required'
-                  }}
-                />
-              </div>
-            </div>
-            <div className="flex justify-end">
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger>
+            <Button
+              title="Edit Tracking Info"
+              variant="outline"
+              onClick={() => {
+                setDialogOpen(true);
+              }}
+            >
+              Edit Tracking Info
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Tracking Info</DialogTitle>
+            </DialogHeader>
+            <Form
+              form={form}
+              id="editTrackingInfo"
+              method="PATCH"
+              action={shipment.updateShipmentApi}
+              submitBtn={false}
+              onSuccess={() => {
+                location.reload();
+              }}
+            >
               <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <InputField
+                    type="text"
+                    name="tracking_number"
+                    label="Tracking number"
+                    placeholder="Tracking number"
+                    defaultValue={shipment.trackingNumber || ''}
+                    required
+                    validation={{
+                      required: 'Tracking number is required'
+                    }}
+                  />
+                </div>
+                <div>
+                  <SelectField
+                    name="carrier"
+                    label="Carrier"
+                    defaultValue={shipment.carrier || ''}
+                    required
+                    options={carriers}
+                    validation={{
+                      required: 'Carrier is required'
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <div className="grid grid-cols-2 gap-2"></div>
+              </div>
+            </Form>
+            <DialogFooter>
+              <DialogClose>
                 <Button
                   title="Cancel"
-                  variant="danger"
-                  onAction={modal.close}
-                />
-                <Button
-                  title="Save"
-                  variant="primary"
-                  isLoading={form.formState.isSubmitting}
-                  onAction={async () => {
-                    (
-                      document.getElementById(
-                        'editTrackingInfo'
-                      ) as HTMLFormElement
-                    ).dispatchEvent(
-                      new Event('submit', { cancelable: true, bubbles: true })
-                    );
+                  variant="outline"
+                  onClick={() => {
+                    setDialogOpen(false);
                   }}
-                />
-              </div>
-            </div>
-          </Form>
-        </Modal>
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button
+                title="Save"
+                variant="default"
+                isLoading={form.formState.isSubmitting}
+                onClick={async () => {
+                  (
+                    document.getElementById(
+                      'editTrackingInfo'
+                    ) as HTMLFormElement
+                  ).dispatchEvent(
+                    new Event('submit', { cancelable: true, bubbles: true })
+                  );
+                }}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </>
     );
   }
@@ -119,6 +141,7 @@ export const layout = {
 export const query = `
   query Query {
     order(uuid: getContextValue("orderId")) {
+      noShippingRequired
       shipment {
         shipmentId
         carrier

@@ -1,6 +1,12 @@
-import { Card } from '@components/admin/Card.js';
 import { NumberField } from '@components/common/form/NumberField.js';
 import { RadioGroupField } from '@components/common/form/RadioGroupField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface InventoryProps {
@@ -21,8 +27,14 @@ export default function Inventory({ product }: InventoryProps) {
     manageStock: undefined
   };
   return (
-    <Card title="Inventory" subdued>
-      <Card.Session>
+    <Card className="bg-popover">
+      <CardHeader>
+        <CardTitle>Inventory</CardTitle>
+        <CardDescription>
+          Manage the inventory settings of the product.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <RadioGroupField
           name="manage_stock"
           label="Manage Stock"
@@ -33,8 +45,8 @@ export default function Inventory({ product }: InventoryProps) {
           defaultValue={inventory.manageStock === 0 ? 0 : 1}
           required
         />
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="border-t border-t-border pt-6">
         <RadioGroupField
           name="stock_availability"
           label="Stock Availability"
@@ -45,8 +57,8 @@ export default function Inventory({ product }: InventoryProps) {
           defaultValue={inventory.stockAvailability === 0 ? 0 : 1}
           required
         />
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="border-t border-t-border pt-6">
         <NumberField
           name="qty"
           defaultValue={inventory.qty}
@@ -54,7 +66,7 @@ export default function Inventory({ product }: InventoryProps) {
           label="Quantity"
           required
         />
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

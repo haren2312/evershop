@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Widget } from '../../types/widget.js';
 import { warning } from '../log/logger.js';
-import { generateComponentKey } from '../webpack/util/keyGenerator.js';
+import { generateComponentKey } from '../util/keyGenerator.js';
 
 /**
  * Checks if a given path is a valid and resolvable JavaScript file path.

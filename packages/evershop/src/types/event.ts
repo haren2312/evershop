@@ -1,19 +1,27 @@
+import {
+  CategoryRow,
+  CustomerRow,
+  OrderRow,
+  ProductImageRow,
+  ProductInventoryRow,
+  ProductRow
+} from './db/index.js';
 /**
  * Event registry that maps event names to their data types.
  * Extend this interface in your modules to register custom events.
- * 
+ *
  * @example
  * ```typescript
  * // In your module
- * declare module '@evershop/evershop/lib/event/types' {
+ * declare module '@evershop/evershop/types/event' {
  *   interface EventDataRegistry {
- *     'order.placed': {
+ *     'order_placed': {
  *       orderId: number;
  *       customerId: number;
  *       total: number;
  *       items: Array<{ productId: number; quantity: number }>;
  *     };
- *     'customer.registered': {
+ *     'customer_registered': {
  *       customerId: number;
  *       email: string;
  *       name: string;
@@ -23,8 +31,105 @@
  * ```
  */
 export interface EventDataRegistry {
-  // Core events can be defined here
-  // Modules can extend this interface to add their own events
+  /**
+   * Fired when a new product is created
+   * Data: Complete product table row
+   */
+  product_created: ProductRow;
+
+  /**
+   * Fired when a product is updated
+   * Data: Complete product table row
+   */
+  product_updated: ProductRow;
+
+  /**
+   * Fired when a product is deleted
+   * Data: Complete product table row
+   */
+  product_deleted: ProductRow;
+
+  /**
+   * Fired when a product image is added
+   * Data: Complete product_image table row
+   */
+  product_image_added: ProductImageRow;
+
+  /**
+   * Fired when a new category is created
+   * Data: Complete category table row
+   */
+  category_created: CategoryRow;
+
+  /**
+   * Fired when a category is updated
+   * Data: Complete category table row
+   */
+  category_updated: CategoryRow;
+  /**
+   * Fired when a category is deleted
+   * Data: Complete category table row
+   */
+  category_deleted: CategoryRow;
+
+  /**
+   * Fired when product inventory is updated
+   * Data: Complete product_inventory table row
+   */
+  inventory_updated: {
+    old: ProductInventoryRow;
+    new: ProductInventoryRow;
+  };
+
+  /**
+   * Fired when a new customer is registered and status = 1 (account is active)
+   * Data: Complete customer table row
+   */
+  customer_registered: CustomerRow;
+
+  /**
+   * Fired when a new customer record is added to database, regardless of the status value
+   * Data: Complete customer table row
+   */
+  customer_created: CustomerRow;
+
+  /**
+   * Fired when a customer record in database is updated
+   * Data: Complete customer table row
+   */
+  customer_updated: CustomerRow;
+
+  /**
+   * Fired when a customer record is deleted
+   * Data: Complete customer table row
+   */
+  customer_deleted: CustomerRow;
+
+  /**
+   * Fired when a new order record is created in database, regardless of the payment method or order status
+   * Data: Complete order table row
+   */
+  order_created: OrderRow;
+
+  /**
+   * Fired when a new order is placed
+   * (This means the order is created and the payment is successful (decided by the payment method, for example, for cod, the order is created when the order is placed, but for online payment, the order is created when the payment is successful))
+   */
+  order_placed: OrderRow;
+
+  /**
+   * Fired when an order status is updated.
+   * Data: {
+   *   orderId: number;
+   *   before: string; // the previous order status
+   *   after: string; // the new order status
+   * }
+   */
+  order_status_updated: {
+    orderId: number;
+    before: string;
+    after: string;
+  };
 }
 
 /**

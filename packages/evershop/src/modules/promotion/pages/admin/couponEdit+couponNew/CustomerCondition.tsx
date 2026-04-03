@@ -32,6 +32,7 @@ export default function CustomerCondition({
   return (
     <Area
       id="couponCustomerCondition"
+      className="space-y-3"
       coreComponents={[
         {
           component: {
@@ -79,7 +80,9 @@ export default function CustomerCondition({
               <NumberField
                 label="Customer's purchase"
                 placeholder="Enter purchased amount"
-                defaultValue={condition?.purchased || 0}
+                defaultValue={
+                  parseInt(condition?.purchased as unknown as string) || 0
+                }
                 name="user_condition.purchased"
                 min={0}
                 helperText="Minimum purchased amount. This only applies to registered customers."

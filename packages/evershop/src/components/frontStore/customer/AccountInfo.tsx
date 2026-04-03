@@ -4,8 +4,7 @@ import {
   useCustomerDispatch
 } from '@components/frontStore/customer/CustomerContext.jsx';
 import { _ } from '@evershop/evershop/lib/locale/translate/_';
-import { AtSymbolIcon } from '@heroicons/react/24/outline';
-import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { Mail, User } from 'lucide-react';
 import React from 'react';
 import { toast } from 'react-toastify';
 
@@ -18,7 +17,7 @@ export default function AccountInfo({ title, showLogout }: AccountInfoProps) {
   const { logout } = useCustomerDispatch();
   return (
     <div className="account__details divide-y">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center border-border">
         {title && <h2>{title}</h2>}
         {showLogout && (
           <a
@@ -47,7 +46,7 @@ export default function AccountInfo({ title, showLogout }: AccountInfoProps) {
                 default: (
                   <div className="account__details__name flex gap-2 py-2">
                     <div>
-                      <UserCircleIcon width={20} height={20} />
+                      <User width={20} height={20} />
                     </div>
                     <div>{account?.fullName}</div>
                   </div>
@@ -60,7 +59,7 @@ export default function AccountInfo({ title, showLogout }: AccountInfoProps) {
                 default: () => (
                   <div className="account__details__email flex gap-2 py-2">
                     <div>
-                      <AtSymbolIcon width={20} height={20} />
+                      <Mail width={20} height={20} />
                     </div>
                     <div>{account?.email}</div>
                   </div>

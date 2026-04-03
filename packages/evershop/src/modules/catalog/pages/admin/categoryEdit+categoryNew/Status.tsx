@@ -1,7 +1,12 @@
-import { Card } from '@components/admin/Card.js';
 import { RadioGroupField } from '@components/common/form/RadioGroupField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
-import { useFormContext } from 'react-hook-form';
 
 export interface CategoryStatusProps {
   category?: {
@@ -12,13 +17,18 @@ export interface CategoryStatusProps {
 }
 
 export default function Status({ category }: CategoryStatusProps) {
-  const { register } = useFormContext();
-
   return (
     <Card>
-      <Card.Session title="Status">
+      <CardHeader>
+        <CardTitle>Status</CardTitle>
+        <CardDescription>
+          Manage the status settings of the category.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <RadioGroupField
           name="status"
+          label="Status"
           options={[
             { label: 'Disabled', value: 0 },
             { label: 'Enabled', value: 1 }
@@ -28,10 +38,11 @@ export default function Status({ category }: CategoryStatusProps) {
             required: 'This field is required'
           }}
         />
-      </Card.Session>
-      <Card.Session title="Include In Store Menu">
+      </CardContent>
+      <CardContent className="pt-6 border-t border-border">
         <RadioGroupField
           name="include_in_nav"
+          label="Include in Store Menu?"
           options={[
             { label: 'No', value: 0 },
             { label: 'Yes', value: 1 }
@@ -41,10 +52,11 @@ export default function Status({ category }: CategoryStatusProps) {
             required: 'This field is required'
           }}
         />
-      </Card.Session>
-      <Card.Session title="Show Products?">
+      </CardContent>
+      <CardContent className="pt-6 border-t border-border">
         <RadioGroupField
           name="show_products"
+          label="Show products?"
           options={[
             { label: 'No', value: 0 },
             { label: 'Yes', value: 1 }
@@ -54,7 +66,7 @@ export default function Status({ category }: CategoryStatusProps) {
             required: 'This field is required'
           }}
         />
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

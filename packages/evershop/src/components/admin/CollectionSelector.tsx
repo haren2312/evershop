@@ -1,8 +1,10 @@
 import { SimplePagination } from '@components/common/SimplePagination.js';
-import { CheckIcon } from '@heroicons/react/24/outline';
+import { Button } from '@components/common/ui/Button.js';
+import { Input } from '@components/common/ui/Input.js';
+import { Skeleton } from '@components/common/ui/Skeleton.js';
+import { Check } from 'lucide-react';
 import React from 'react';
 import { useQuery } from 'urql';
-import './CollectionSelector.scss';
 import { AtLeastOne } from '../../types/atLeastOne.js';
 
 const SearchQuery = `
@@ -27,20 +29,17 @@ const CollectionListSkeleton: React.FC = () => {
   const skeletonItems = Array(5).fill(0);
 
   return (
-    <div className="collection-list-skeleton">
+    <div className="attribute-group-list-skeleton space-y-2 divide-y">
       {skeletonItems.map((_, index) => (
         <div
           key={index}
-          className="collection-skeleton-item border-b flex justify-between items-center"
+          className="attribute-group-skeleton-item border-border pb-2 flex justify-between items-center "
         >
           <div className="flex items-center">
-            <div>
-              <div className="skeleton-title h-5 w-30 bg-gray-200 rounded skeleton-pulse mb-2"></div>
-              <div className="skeleton-id h-4 w-20 bg-gray-200 rounded skeleton-pulse"></div>
-            </div>
+            <Skeleton className="h-5 w-30 rounded"></Skeleton>
           </div>
           <div className="select-button">
-            <div className="skeleton-button h-6 w-12 bg-gray-200 rounded skeleton-pulse"></div>
+            <Skeleton className="h-6 w-12 rounded"></Skeleton>
           </div>
         </div>
       ))}
@@ -123,7 +122,7 @@ const CollectionSelector: React.FC<{
 
   if (error) {
     return (
-      <p className="text-critical">
+      <p className="text-destructive">
         There was an error fetching collections.
         {error.message}
       </p>
@@ -134,17 +133,15 @@ const CollectionSelector: React.FC<{
     <div>
       <div>
         <div className="p-2">
-          <div className="form-field">
-            <input
-              type="text"
-              value={inputValue || ''}
-              placeholder="Search collections"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setInputValue(e.target.value);
-                setLoading(true);
-              }}
-            />
-          </div>
+          <Input
+            type="text"
+            value={inputValue || ''}
+            placeholder="Search collections"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setInputValue(e.target.value);
+              setLoading(true);
+            }}
+          />
         </div>
         {(fetching || loading) && <CollectionListSkeleton />}
         {!fetching && data && (
@@ -170,9 +167,8 @@ const CollectionSelector: React.FC<{
                 </div>
                 <div className="col-span-3 text-right">
                   {!isCollectionSelected(c, internalSelectedCollections) && (
-                    <button
-                      type="button"
-                      className="button secondary"
+                    <Button
+                      variant="outline"
                       onClick={async (e) => {
                         e.preventDefault();
                         setInternalSelectedCollections((prev) => [
@@ -187,12 +183,11 @@ const CollectionSelector: React.FC<{
                       }}
                     >
                       Select
-                    </button>
+                    </Button>
                   )}
                   {isCollectionSelected(c, internalSelectedCollections) && (
-                    <a
-                      className="button primary"
-                      href="#"
+                    <Button
+                      variant="default"
                       onClick={(e) => {
                         e.preventDefault();
                         setInternalSelectedCollections((prev) =>
@@ -205,8 +200,8 @@ const CollectionSelector: React.FC<{
                         onUnSelect(c.collectionId, c.uuid, c.name);
                       }}
                     >
-                      <CheckIcon width={20} height={20} />
-                    </a>
+                      <Check width={20} height={20} />
+                    </Button>
                   )}
                 </div>
               </div>

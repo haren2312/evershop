@@ -1,4 +1,14 @@
 import { NumberField } from '@components/common/form/NumberField.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Table,
+  TableRow,
+  TableBody,
+  TableHeader,
+  TableHead,
+  TableCell,
+  TableFooter
+} from '@components/common/ui/Table.js';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
@@ -40,53 +50,54 @@ export function WeightBasedPrice({ lines }: WeightBasedPriceProps) {
 
   return (
     <div className="my-5">
-      <table className="border-collapse divide-y">
-        <thead>
-          <tr>
-            <th className="border-none">Min Weight</th>
-            <th className="border-none">Shipping Cost</th>
-            <th className="border-none">Action</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="border-none">Min Weight</TableHead>
+            <TableHead className="border-none">Shipping Cost</TableHead>
+            <TableHead className="border-none">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {fields.map((field, index) => (
-            <tr key={field.id} className="border-divider py-5">
-              <td className="border-none">
+            <TableRow key={field.id} className="border-divider py-5">
+              <TableCell className="border-none">
                 <NumberField
                   name={`weight_based_cost.${index}.min_weight`}
                   placeholder="Min Weight"
                   required
                   validation={{ required: 'Min weight is required' }}
                 />
-              </td>
-              <td className="border-none">
+              </TableCell>
+              <TableCell className="border-none">
                 <NumberField
                   name={`weight_based_cost.${index}.cost`}
                   placeholder="Shipping Cost"
                   required
                   validation={{ required: 'Shipping cost is required' }}
                 />
-              </td>
-              <td className="border-none">
+              </TableCell>
+              <TableCell className="border-none">
                 {fields.length > 1 && (
                   <button
                     type="button"
                     onClick={() => remove(index)}
-                    className="text-critical"
+                    className="text-destructive"
                   >
                     Delete
                   </button>
                 )}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colSpan={3} className="border-none">
-              <button
+        </TableBody>
+        <TableFooter className="border-border">
+          <TableRow>
+            <TableCell colSpan={3} className="border-none">
+              <Button
                 type="button"
-                className="text-interactive"
+                size={'sm'}
+                variant={'outline'}
                 onClick={() => {
                   append({
                     min_weight: undefined,
@@ -95,11 +106,11 @@ export function WeightBasedPrice({ lines }: WeightBasedPriceProps) {
                 }}
               >
                 + Add Line
-              </button>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableFooter>
+      </Table>
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import Spinner from '@components/admin/Spinner.jsx';
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger
+} from '@components/common/ui/Dialog.js';
 import React from 'react';
 import { useQuery } from 'urql';
 import { Zone } from './Zone.js';
@@ -76,14 +80,14 @@ export function Zones({
 }: {
   createShippingZoneApi: string;
 }) {
-  const modal = useModal();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   const [{ data, fetching, error }, reexecuteQuery] = useQuery({
     query: ZonesQuery,
     requestPolicy: 'network-only'
   });
 
-  if (fetching) return <Spinner />;
-  if (error) return <div>Error loading zones</div>;
+  if (fetching) return <Spinner width={'2rem'} height={'2rem'} />;
+  if (error) return <div className="text-destructive">Error loading zones</div>;
 
   if (!data || !data.shippingZones) return <div>No zones found</div>;
   const reload = () => {
@@ -94,32 +98,23 @@ export function Zones({
       {data.shippingZones.map((zone) => (
         <Zone zone={zone} reload={reload} key={zone.uuid} />
       ))}
-      <div className="flex justify-end p-5">
-        <a
-          href="#"
-          className="text-interactive button primary"
-          onClick={(e) => {
-            e.preventDefault();
-            modal.open();
-          }}
-        >
-          Create New Zone
-        </a>
-      </div>
-      <Modal
-        title="Create New Shipping Zone"
-        onClose={modal.close}
-        isOpen={modal.isOpen}
-      >
-        <ZoneForm
-          formMethod="POST"
-          saveZoneApi={createShippingZoneApi}
-          onSuccess={() => {
-            modal.close();
-          }}
-          reload={reload}
-        />
-      </Modal>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex justify-end pr-5">
+          <DialogTrigger>
+            <Button>Create New Zone</Button>
+          </DialogTrigger>
+        </div>
+        <DialogContent>
+          <ZoneForm
+            formMethod="POST"
+            saveZoneApi={createShippingZoneApi}
+            onSuccess={() => {
+              setDialogOpen(false);
+            }}
+            reload={reload}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

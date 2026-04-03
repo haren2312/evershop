@@ -1,7 +1,6 @@
 import { access } from 'fs/promises';
 import path from 'path';
 import { select } from '@evershop/postgres-query-builder';
-import { normalizePort } from '../../../../../bin/lib/normalizePort.js';
 import { CONSTANTS } from '../../../../../lib/helpers.js';
 import { translate } from '../../../../../lib/locale/translate/translate.js';
 import { get } from '../../../../../lib/util/get.js';
@@ -9,12 +8,17 @@ import { getBaseUrl } from '../../../../../lib/util/getBaseUrl.js';
 import { getConfig } from '../../../../../lib/util/getConfig.js';
 import { getValueSync } from '../../../../../lib/util/registry.js';
 import { OgInfo } from '../../../../../types/pageMeta.js';
+import { getSetting } from '../../../../setting/services/setting.js';
 
 export default {
   Query: {
-    pageInfo: (root, args, context) => ({
+    pageInfo: async (root, args, context) => ({
       url: get(context, 'currentUrl'),
-      title: get(context, 'pageInfo.title', getConfig('shop.name', 'Evershop')),
+      title: get(
+        context,
+        'pageInfo.title',
+        await getSetting('storeName', 'Evershop')
+      ),
       description: get(context, 'pageInfo.description', ''),
       keywords: get(context, 'pageInfo.keywords', []),
       canonicalUrl: get(
@@ -106,10 +110,9 @@ export default {
         return breadcrumbs;
       }
     },
-    ogInfo: (root, args, context): OgInfo => {
-      let logo = getConfig<string>('themeConfig.logo.src');
-      const port = normalizePort();
-      const baseUrl = getConfig('shop.homeUrl', `http://localhost:${port}`);
+    ogInfo: async (root, args, context): Promise<OgInfo> => {
+      let logo = getConfig('themeConfig.logo.src');
+      const baseUrl = getBaseUrl();
       // Check if logo is a full URL
       // If logo is not set, use default /images/logo.png
       if (logo && !logo.startsWith('http')) {
@@ -144,12 +147,12 @@ export default {
           twitterSite: get(
             context,
             'pageInfo.ogInfo.twitterSite',
-            getConfig('shop.name', 'Evershop')
+            await getSetting('storeName', 'Evershop')
           ),
           twitterCreator: get(
             context,
             'pageInfo.ogInfo.twitterCreator',
-            getConfig('shop.name', 'Evershop')
+            await getSetting('storeName', 'Evershop')
           ),
           twitterImage: get(context, 'pageInfo.ogInfo.twitterImage', image)
         },

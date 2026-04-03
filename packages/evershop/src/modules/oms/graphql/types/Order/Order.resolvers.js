@@ -60,8 +60,7 @@ export default {
       const status = statusList[shipmentStatus] || {
         name: 'Unknown',
         code: shipmentStatus,
-        badge: 'default',
-        progress: 'incomplete'
+        badge: 'default'
       };
 
       return {
@@ -74,8 +73,7 @@ export default {
       const status = statusList[paymentStatus] || {
         name: 'Unknown',
         code: paymentStatus,
-        badge: 'default',
-        progress: 'incomplete'
+        badge: 'default'
       };
 
       return {
@@ -88,8 +86,7 @@ export default {
       const statusObj = statusList[status] || {
         name: 'Unknown',
         code: status,
-        badge: 'default',
-        progress: 'incomplete'
+        badge: 'default'
       };
 
       return {

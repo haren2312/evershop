@@ -50,6 +50,7 @@ export default function General({ coupon }: { coupon?: Coupon }) {
   return (
     <Area
       id="couponFormGeneral"
+      className="space-y-3"
       coreComponents={[
         {
           component: {

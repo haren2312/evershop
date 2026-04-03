@@ -23,7 +23,7 @@ export default function TextBlockSetting({
   }, [editorValue, setValue]);
 
   return (
-    <div>
+    <div className="space-y-3">
       <InputField
         label="Custom CSS classes"
         name="settings.className"

@@ -1,6 +1,12 @@
-import { Card } from '@components/admin/Card.js';
 import { NumberField } from '@components/common/form/NumberField.js';
 import { RadioGroupField } from '@components/common/form/RadioGroupField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface GeneralProps {
@@ -13,8 +19,12 @@ interface GeneralProps {
 }
 export default function General({ attribute }: GeneralProps) {
   return (
-    <Card title="Setting" subdued>
-      <Card.Session>
+    <Card className="bg-popover">
+      <CardHeader>
+        <CardTitle>Setting</CardTitle>
+        <CardDescription>Manage the setting of the attribute.</CardDescription>
+      </CardHeader>
+      <CardContent>
         <RadioGroupField
           name="is_required"
           label="Is Required?"
@@ -28,8 +38,8 @@ export default function General({ attribute }: GeneralProps) {
           }}
           defaultValue={attribute?.isRequired === 0 ? 0 : 1}
         />
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-6 border-t border-border">
         <RadioGroupField
           name="is_filterable"
           label="Is Filterable?"
@@ -43,8 +53,8 @@ export default function General({ attribute }: GeneralProps) {
           }}
           defaultValue={attribute?.isFilterable === 1 ? 1 : 0}
         />
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-6 border-t border-border">
         <RadioGroupField
           name="display_on_frontend"
           label="Display on Frontend?"
@@ -58,8 +68,8 @@ export default function General({ attribute }: GeneralProps) {
           }}
           defaultValue={attribute?.displayOnFrontend === 1 ? 1 : 0}
         />
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-6 border-t border-border">
         <NumberField
           name="sort_order"
           label="Sort Order"
@@ -74,7 +84,7 @@ export default function General({ attribute }: GeneralProps) {
           }}
           defaultValue={attribute?.sortOrder}
         />
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

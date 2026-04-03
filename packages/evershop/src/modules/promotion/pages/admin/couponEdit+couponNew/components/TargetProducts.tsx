@@ -1,6 +1,16 @@
 import { InputField } from '@components/common/form/InputField.js';
 import { NumberField } from '@components/common/form/NumberField.js';
 import { SelectField } from '@components/common/form/SelectField.js';
+import { Button } from '@components/common/ui/Button.js';
+import { Item, ItemContent, ItemTitle } from '@components/common/ui/Item.js';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@components/common/ui/Table.js';
 import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { options, operators, Operator } from './conditionCriterias.js';
@@ -75,25 +85,25 @@ function Products({
           <div>quantity of products are matched bellow conditions(All)</div>
         </div>
       </div>
-      <table className="table table-bordered" style={{ marginTop: 0 }}>
-        <thead>
-          <tr>
-            <th>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>
               <span>Key</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>Operator</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>Value</span>
-            </th>
-            <th> </th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+            <TableHead> </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {fields.map((product, index) => (
-            <tr key={product.id}>
-              <td>
+            <TableRow key={product.id}>
+              <TableCell>
                 {product.editable ? (
                   <SelectField
                     name={`target_products.products.${index}.key`}
@@ -125,8 +135,8 @@ function Products({
                     />
                   </>
                 )}
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 {product.editable ? (
                   <SelectField
                     name={`target_products.products.${index}.operator`}
@@ -153,14 +163,15 @@ function Products({
                       readOnly
                       wrapperClassName="form-field mb-0"
                       value={
-                        options.find((c) => c.key === product.operator)
-                          ?.label || 'Unknown'
+                        operators.find(
+                          (c) => c.key === fieldWatch[index]?.operator
+                        )?.label || 'Unknown'
                       }
                     />
                   </>
                 )}
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 {fieldWatch[index].key === 'price' && (
                   <NumberField
                     name={`target_products.products.${index}.value`}
@@ -187,11 +198,11 @@ function Products({
                     />
                   </>
                 )}
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <a
                   href="#"
-                  className="text-critical"
+                  className="text-destructive"
                   onClick={(e) => {
                     e.preventDefault();
                     remove(index);
@@ -213,32 +224,15 @@ function Products({
                     />
                   </svg>
                 </a>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       <div className="mt-2 flex justify-start">
-        <div className="items-center flex">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="1.5rem"
-            height="1.5rem"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-        </div>
         <div className="pl-2">
-          <a
-            href="#"
+          <Button
+            variant={'outline'}
             onClick={(e) => {
               e.preventDefault();
               append({
@@ -248,10 +242,9 @@ function Products({
                 editable: true
               });
             }}
-            className=""
           >
             <span>Add product</span>
-          </a>
+          </Button>
         </div>
       </div>
     </div>
@@ -276,9 +269,11 @@ export function TargetProducts({
   }
 
   return (
-    <div>
-      <h3 className="card-title">Target products</h3>
-      <Products targetProducts={products} maxQty={maxQty} />
-    </div>
+    <Item variant={'outline'} className="mt-6">
+      <ItemContent>
+        <ItemTitle>Target Products</ItemTitle>
+        <Products targetProducts={products} maxQty={maxQty} />
+      </ItemContent>
+    </Item>
   );
 }

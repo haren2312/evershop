@@ -1,5 +1,5 @@
 import { NavigationItem } from '@components/admin/NavigationItem.js';
-import { GiftIcon } from '@heroicons/react/24/solid';
+import { GiftIcon } from 'lucide-react';
 import React from 'react';
 
 interface NewCouponQuickLinkProps {

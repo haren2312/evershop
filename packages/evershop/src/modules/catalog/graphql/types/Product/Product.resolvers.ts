@@ -1,4 +1,5 @@
 import { select } from '@evershop/postgres-query-builder';
+import sanitizeHtml from 'sanitize-html';
 import { v4 as uuidv4 } from 'uuid';
 import { buildUrl } from '../../../../../lib/router/buildUrl.js';
 import { buildFilterFromUrl } from '../../../../../lib/util/buildFilterFromUrl.js';
@@ -26,7 +27,8 @@ export default {
         return [];
       }
       try {
-        return JSON.parse(description);
+        const json = JSON.parse(description);
+        return json;
       } catch (e) {
         // This is for backward compatibility. If the description is not a JSON string then it is a raw HTML block
         const rowId = `r__${uuidv4()}`;

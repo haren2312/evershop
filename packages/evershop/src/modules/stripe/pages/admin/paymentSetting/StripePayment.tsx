@@ -1,7 +1,13 @@
-import { Card } from '@components/admin/Card.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { RadioGroupField } from '@components/common/form/RadioGroupField.js';
 import { ToggleField } from '@components/common/form/ToggleField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface StripePaymentProps {
@@ -25,8 +31,14 @@ export default function StripePayment({
   }
 }: StripePaymentProps) {
   return (
-    <Card title="Stripe Payment">
-      <Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>Stripe Payment</CardTitle>
+        <CardDescription>
+          Configure your Stripe payment gateway settings
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Enable?</h4>
@@ -40,53 +52,50 @@ export default function StripePayment({
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Dislay Name</h4>
           </div>
           <div className="col-span-2">
             <InputField
-              label="Display Name"
               name="stripeDisplayName"
               placeholder="Display Name"
-              defaultValue={stripeDisplayName}
+              defaultValue={stripeDisplayName || ''}
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Publishable Key</h4>
           </div>
           <div className="col-span-2">
             <InputField
-              label="Publishable Key"
               name="stripePublishableKey"
               placeholder="Publishable Key"
-              defaultValue={stripePublishableKey}
+              defaultValue={stripePublishableKey || ''}
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Secret Key</h4>
           </div>
           <div className="col-span-2">
             <InputField
-              label="Secret Key"
               name="stripeSecretKey"
               placeholder="Secret Key"
-              defaultValue={stripeSecretKey}
+              defaultValue={stripeSecretKey || ''}
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Webhook Secret Key</h4>
@@ -95,14 +104,13 @@ export default function StripePayment({
             <InputField
               name="stripeEndpointSecret"
               placeholder="Secret Key"
-              label="Webhook Secret Key"
-              defaultValue={stripeEndpointSecret}
+              defaultValue={stripeEndpointSecret || ''}
               helperText="Your webhook url should be: https://yourdomain.com/api/stripe/webhook"
             />
           </div>
         </div>
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="pt-4 border-t border-border">
         <div className="grid grid-cols-3 gap-5">
           <div className="col-span-1 items-center flex">
             <h4>Payment mode</h4>
@@ -118,7 +126,7 @@ export default function StripePayment({
             />
           </div>
         </div>
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

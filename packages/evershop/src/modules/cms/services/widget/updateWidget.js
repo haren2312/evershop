@@ -6,7 +6,7 @@ import {
   update
 } from '@evershop/postgres-query-builder';
 import { getConnection } from '../../../../lib/postgres/connection.js';
-import { hookable } from '../../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../../lib/util/hookable.js';
 import {
   getValue,
   getValueSync
@@ -82,3 +82,19 @@ export default async (uuid, data, context) => {
   const widget = await hookable(updateWidget, context)(uuid, data, context);
   return widget;
 };
+
+export function hookBeforeUpdateWidgetData(callback, priority = 10) {
+  hookBefore('updateWidgetData', callback, priority);
+}
+
+export function hookAfterUpdateWidgetData(callback, priority = 10) {
+  hookAfter('updateWidgetData', callback, priority);
+}
+
+export function hookBeforeUpdateWidget(callback, priority = 10) {
+  hookBefore('updateWidget', callback, priority);
+}
+
+export function hookAfterUpdateWidget(callback, priority = 10) {
+  hookAfter('updateWidget', callback, priority);
+}

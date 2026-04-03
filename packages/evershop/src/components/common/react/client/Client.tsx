@@ -12,7 +12,9 @@ declare global {
 }
 
 const client = createClient({
-  url: '/api/graphql'
+  url: window.eContext?.config?.pageMeta?.route?.isAdmin
+    ? '/api/admin/graphql'
+    : '/api/graphql'
 });
 
 interface AppProps {

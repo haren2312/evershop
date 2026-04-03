@@ -1,16 +1,10 @@
 import { NavigationItem } from '@components/admin/NavigationItem.js';
-import { ArchiveBoxIcon } from '@heroicons/react/24/solid';
+import { BoxIcon } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 export default function NewProductQuickLink({ productNew }) {
-  return (
-    <NavigationItem
-      Icon={ArchiveBoxIcon}
-      title="New Product"
-      url={productNew}
-    />
-  );
+  return <NavigationItem Icon={BoxIcon} title="New Product" url={productNew} />;
 }
 
 NewProductQuickLink.propTypes = {

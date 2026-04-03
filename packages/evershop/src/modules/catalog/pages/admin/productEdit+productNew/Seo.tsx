@@ -1,7 +1,13 @@
-import { Card } from '@components/admin/Card.js';
 import Area from '@components/common/Area.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { TextareaField } from '@components/common/form/TextareaField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface SEOProps {
@@ -74,7 +80,7 @@ export default function SEO({ product }: SEOProps) {
             name="meta_description"
             label="Meta Description"
             placeholder="Enter Meta Description"
-            defaultValue={product?.metaDescription}
+            defaultValue={product?.metaDescription || ''}
           />
         )
       },
@@ -83,10 +89,18 @@ export default function SEO({ product }: SEOProps) {
   ];
 
   return (
-    <Card title="Search engine optimize">
-      <Card.Session>
-        <Area id="productEditSeo" coreComponents={fields} />
-      </Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>SEO</CardTitle>
+        <CardDescription>Manage the SEO settings.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Area
+          id="productEditSeo"
+          coreComponents={fields}
+          className="flex flex-col gap-2"
+        />
+      </CardContent>
     </Card>
   );
 }

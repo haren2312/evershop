@@ -9,7 +9,7 @@ import {
   PoolClient
 } from '@evershop/postgres-query-builder';
 import { pool } from '../../../lib/postgres/connection.js';
-import { hookable } from '../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../lib/util/hookable.js';
 import { Address } from '../../../types/customerAddress.js';
 import { validateAddress } from '../../customer/services/customer/address/addressValidators.js';
 
@@ -29,7 +29,7 @@ interface ShippingAddress extends Address {
  * @throws {Error} If cart does not exist, address validation fails, or shipping zone is not available
  * @returns {Promise<Address>} The newly created address object
  */
-async function addShippingAddressService<
+const _addShippingAddress = async function addShippingAddress<
   T extends Address = Address,
   R = ShippingAddress
 >(
@@ -97,7 +97,7 @@ async function addShippingAddressService<
     })(addressData, connection);
 
     // Update cart with shipping zone and address
-    await hookable(updateCartWithAddress, {
+    await hookable(updateCartWithShippingAddress, {
       cartUUID,
       addressData,
       cart,
@@ -113,7 +113,7 @@ async function addShippingAddressService<
     await rollback(connection);
     throw error;
   }
-}
+};
 
 /**
  * Find shipping zone for the given address
@@ -161,7 +161,7 @@ async function saveShippingAddress(
 /**
  * Update cart with shipping zone and address
  */
-async function updateCartWithAddress(
+async function updateCartWithShippingAddress(
   cartId: number,
   addressId: number,
   connection: PoolClient
@@ -183,10 +183,58 @@ export const addShippingAddress = async (
   addressData: Address,
   context: Record<string, unknown> = {}
 ) => {
-  const result = await hookable(addShippingAddressService, {
+  const result = await hookable(_addShippingAddress, {
     cartUUID,
     addressData,
     ...context
   })(cartUUID, addressData, context);
   return result;
 };
+
+export function hookBeforeSaveShippingAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [addressData: Address, connection: PoolClient]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('saveShippingAddress', callback, priority);
+}
+
+export function hookAfterSaveShippingAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [addressData: Address, connection: PoolClient]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('saveShippingAddress', callback, priority);
+}
+
+export function hookBeforeAddShippingAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+      cartUUID: string,
+      addressData: Address,
+      context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('addShippingAddress', callback, priority);
+}
+
+export function hookAfterAddShippingAddress(
+  callback: (
+    this: Record<string, unknown>,
+    ...args: [
+      cartUUID: string,
+      addressData: Address,
+      context: Record<string, unknown>
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('addShippingAddress', callback, priority);
+}

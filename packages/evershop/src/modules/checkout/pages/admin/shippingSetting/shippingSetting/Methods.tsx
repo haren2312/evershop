@@ -1,5 +1,17 @@
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger
+} from '@components/common/ui/Dialog.js';
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@components/common/ui/Table.js';
 import React from 'react';
 import { Method, ShippingMethod } from './Method.js';
 import { MethodForm } from './MethodForm.js';
@@ -11,46 +23,54 @@ export interface MethodsProps {
 }
 
 export function Methods({ reload, methods, addMethodApi }: MethodsProps) {
-  const modal = useModal();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   return (
-    <div className="my-5">
-      <table className="border-collapse divide-y">
-        <thead>
-          <tr>
-            <th className="border-none">Method</th>
-            <th className="border-none">Status</th>
-            <th className="border-none">Cost</th>
-            <th className="border-none">Condition</th>
-            <th className="border-none">Action</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="my-5 text-xs">
+      <Table>
+        <TableHeader>
+          <TableRow className="text-xs">
+            <TableHead className="border-none">Method</TableHead>
+            <TableHead className="border-none">Status</TableHead>
+            <TableHead className="border-none">Cost</TableHead>
+            <TableHead className="border-none">Condition</TableHead>
+            <TableHead className="border-none">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {methods.map((method) => (
-            <tr key={method.methodId} className="border-divider py-5">
+            <TableRow
+              key={method.methodId}
+              className="border-divider py-5 text-xs"
+            >
               <Method method={method} reload={reload} />
-            </tr>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-      <div className="mt-2">
-        <a
-          href="#"
-          className="text-interactive"
-          onClick={(e) => {
-            e.preventDefault();
-            modal.open();
-          }}
-        >
-          + Add Method
-        </a>
-      </div>
-      <Modal title="Add Method" onClose={modal.close} isOpen={modal.isOpen}>
-        <MethodForm
-          saveMethodApi={addMethodApi}
-          onSuccess={() => modal.close()}
-          reload={reload}
-        />
-      </Modal>
+        </TableBody>
+      </Table>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="mt-2">
+          <DialogTrigger>
+            <Button
+              variant={'link'}
+              onClick={(e) => {
+                e.preventDefault();
+              }}
+            >
+              + Add Method
+            </Button>
+          </DialogTrigger>
+        </div>
+        <DialogContent>
+          <DialogTitle>Add Shipping Method</DialogTitle>
+          <MethodForm
+            saveMethodApi={addMethodApi}
+            onSuccess={() => {
+              setDialogOpen(false);
+            }}
+            reload={reload}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

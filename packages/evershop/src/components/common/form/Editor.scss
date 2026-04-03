@@ -1,10 +1,19 @@
 body .codex-editor {
   z-index: 99;
 }
-
+body .codex-editor:not(.codex-editor--toolbox-opened) {
+  z-index: 1 !important;
+}
 #rows {
   .row {
     background-color: #fff;
+  }
+
+  .row__container {
+    &:hover,
+    &:focus-within {
+      z-index: 100 !important;
+    }
   }
 
   .drag__icon {
@@ -12,7 +21,6 @@ body .codex-editor {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px;
     border-radius: 4px;
 
     &:hover {
@@ -23,10 +31,6 @@ body .codex-editor {
       display: block; // Prevent extra space below svg
     }
   }
-}
-
-#rows > * {
-  margin-top: 10px;
 }
 
 .item {
@@ -46,4 +50,23 @@ body .codex-editor {
 
 .ce-rawtool__textarea {
   z-index: 0;
+  min-height: 200px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+}
+
+.ce-rawtool {
+  margin: 0.5em 0;
 }

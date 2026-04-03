@@ -5,7 +5,6 @@ type Status {
   name: String
   code: String
   badge: String
-  progress: String
 }
 
 """
@@ -15,7 +14,6 @@ type PaymentStatus {
   name: String
   code: String
   badge: String
-  progress: String
   isDefault: Boolean
   isCancelable: Boolean
 }
@@ -27,7 +25,6 @@ type ShipmentStatus {
   name: String
   code: String
   badge: String
-  progress: String
   isDefault: Boolean
   isCancelable: Boolean
 }

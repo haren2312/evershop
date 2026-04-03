@@ -1,5 +1,11 @@
-import { Card } from '@components/admin/Card.js';
-import { TagIcon } from '@heroicons/react/24/solid';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
+import { TagIcon } from 'lucide-react';
 import React from 'react';
 
 export interface Collection {
@@ -15,14 +21,20 @@ export default function Collections({
   };
 }): React.ReactElement {
   return (
-    <Card title="Collections" subdued>
-      <Card.Session>
+    <Card className="bg-popover">
+      <CardHeader>
+        <CardTitle>Collections</CardTitle>
+        <CardDescription>
+          Manage the collections associated with this product.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
         {collections.map((collection) => (
           <div
             className="flex justify-start gap-2 items-center align-middle"
             key={collection.uuid}
           >
-            <TagIcon width={16} height={16} fill="#2c6ecb" />
+            <TagIcon width={16} height={16} />
             <a href={collection.editUrl} className="hover:underline">
               <span>{collection.name}</span>
             </a>
@@ -31,7 +43,7 @@ export default function Collections({
         {collections.length === 0 && (
           <div className="text-gray-500">No collections</div>
         )}
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

@@ -1,6 +1,11 @@
-import { Card } from '@components/admin/Card';
-import { Circle } from '@components/admin/Circle.js';
 import Area from '@components/common/Area.js';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
+import { Circle } from '@components/common/ui/Circle.js';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Discount } from './payment/Discount.js';
@@ -8,7 +13,6 @@ import { Shipping } from './payment/Shipping.js';
 import { SubTotal } from './payment/SubTotal.js';
 import { Tax } from './payment/Tax.js';
 import { Total } from './payment/Total.js';
-import './Payment.scss';
 
 export default function OrderSummary({
   order: {
@@ -27,19 +31,20 @@ export default function OrderSummary({
   }
 }) {
   return (
-    <Card
-      title={
-        <div className="flex space-x-2">
-          <Circle variant={paymentStatus.badge} />
-          <span className="block self-center">
-            {`${paymentStatus.name || 'Unknown'} - ${
-              paymentMethodName || 'Unknown'
-            }`}
-          </span>
-        </div>
-      }
-    >
-      <Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <div className="flex space-x-2">
+            <Circle variant={paymentStatus.badge} />
+            <span className="block self-center">
+              {`${paymentStatus.name || 'Unknown'} - ${
+                paymentMethodName || 'Unknown'
+              }`}
+            </span>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
         <Area
           id="orderSummaryBlock"
           orderId={orderId}
@@ -48,7 +53,7 @@ export default function OrderSummary({
           coupon={coupon}
           discountAmount={discountAmount}
           totalTaxAmount={totalTaxAmount}
-          className="summary-wrapper"
+          className="space-y-3"
           coreComponents={[
             {
               component: { default: SubTotal },
@@ -81,7 +86,7 @@ export default function OrderSummary({
             }
           ]}
         />
-      </Card.Session>
+      </CardContent>
       <Area id="orderPaymentActions" />
     </Card>
   );
@@ -114,7 +119,6 @@ OrderSummary.propTypes = {
     paymentStatus: PropTypes.shape({
       code: PropTypes.string,
       badge: PropTypes.string,
-      progress: PropTypes.string,
       name: PropTypes.string
     }).isRequired
   }).isRequired
@@ -153,7 +157,6 @@ export const query = `
       paymentStatus {
         code
         badge
-        progress
         name
       }
     }

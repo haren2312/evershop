@@ -1,14 +1,15 @@
-import Button from '@components/common/Button.js';
 import { Form } from '@components/common/form/Form.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { SelectField } from '@components/common/form/SelectField.js';
 import { useAlertContext } from '@components/common/modal/Alert.js';
 import RenderIfTrue from '@components/common/RenderIfTrue.js';
+import { Button } from '@components/common/ui/Button.js';
 import React from 'react';
 import { toast } from 'react-toastify';
 
 interface ShipButtonProps {
   order: {
+    noShippingRequired: boolean;
     shipment?: {
       trackingNumber?: string;
       carrier?: string;
@@ -24,19 +25,25 @@ interface ShipButtonProps {
   }[];
 }
 export default function ShipButton({
-  order: { shipment, createShipmentApi, shipmentStatus },
+  order: { noShippingRequired, shipment, createShipmentApi, shipmentStatus },
   carriers
 }: ShipButtonProps) {
   const { openAlert, closeAlert, dispatchAlert } = useAlertContext();
+  if (noShippingRequired) {
+    return (
+      <Button disabled variant="secondary">
+        No Shipping Required
+      </Button>
+    );
+  }
   if (shipment) {
     return null;
   } else {
     return (
       <RenderIfTrue condition={shipmentStatus.code !== 'canceled'}>
         <Button
-          title="Ship Items"
-          variant="primary"
-          onAction={() => {
+          variant="default"
+          onClick={() => {
             openAlert({
               heading: 'Ship Items',
               content: (
@@ -88,7 +95,7 @@ export default function ShipButton({
               primaryAction: {
                 title: 'Cancel',
                 onAction: closeAlert,
-                variant: ''
+                variant: 'outline'
               },
               secondaryAction: {
                 title: 'Ship',
@@ -103,12 +110,14 @@ export default function ShipButton({
                     new Event('submit', { cancelable: true, bubbles: true })
                   );
                 },
-                variant: 'primary',
+                variant: 'default',
                 isLoading: false
               }
             });
           }}
-        />
+        >
+          Ship items
+        </Button>
       </RenderIfTrue>
     );
   }
@@ -122,6 +131,7 @@ export const layout = {
 export const query = `
   query Query {
     order(uuid: getContextValue("orderId")) {
+      noShippingRequired
       shipment {
         shipmentId
         carrier

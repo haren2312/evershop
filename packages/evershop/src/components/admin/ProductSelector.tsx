@@ -1,5 +1,7 @@
 import { SimplePagination } from '@components/common/SimplePagination.js';
-import { CheckIcon } from '@heroicons/react/24/outline';
+import { Button } from '@components/common/ui/Button.js';
+import { Input } from '@components/common/ui/Input.js';
+import { Check } from 'lucide-react';
 import React from 'react';
 import { toast } from 'react-toastify';
 import { useQuery } from 'urql';
@@ -134,7 +136,7 @@ const ProductSelector: React.FC<{
 
   if (error) {
     return (
-      <p className="text-critical">
+      <p className="text-destructive">
         There was an error fetching products.
         {error.message}
       </p>
@@ -144,17 +146,15 @@ const ProductSelector: React.FC<{
   return (
     <div>
       <div className="p-2">
-        <div className="form-field">
-          <input
-            type="text"
-            value={inputValue || ''}
-            placeholder="Search products"
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              setLoading(true);
-            }}
-          />
-        </div>
+        <Input
+          type="text"
+          value={inputValue || ''}
+          placeholder="Search products"
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            setLoading(true);
+          }}
+        />
       </div>
       {(fetching || loading) && <ProductListSkeleton />}
       {!fetching && data && !loading && (
@@ -203,9 +203,8 @@ const ProductSelector: React.FC<{
               </div>
               <div className="col-span-2 text-right">
                 {!isProductSelected(product, internalSelectedProducts) && (
-                  <button
-                    type="button"
-                    className="button secondary"
+                  <Button
+                    variant={'outline'}
                     onClick={async (e) => {
                       e.preventDefault();
                       await selectProduct(
@@ -216,12 +215,10 @@ const ProductSelector: React.FC<{
                     }}
                   >
                     Select
-                  </button>
+                  </Button>
                 )}
                 {isProductSelected(product, internalSelectedProducts) && (
-                  <a
-                    className="button primary"
-                    href="#"
+                  <Button
                     onClick={(e) => {
                       e.preventDefault();
                       unSelectProduct(
@@ -231,8 +228,8 @@ const ProductSelector: React.FC<{
                       );
                     }}
                   >
-                    <CheckIcon width={'1.2rem'} height={'1.2rem'} />
-                  </a>
+                    <Check width={'1.2rem'} height={'1.2rem'} />
+                  </Button>
                 )}
               </div>
             </div>

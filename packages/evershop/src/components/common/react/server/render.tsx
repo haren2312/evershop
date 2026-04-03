@@ -3,10 +3,11 @@ import ServerHtml from '@components/common/react/server/Server.js';
 import React from 'react';
 import { renderToString } from 'react-dom/server.js';
 
-function renderHtml(js, css, contextData, langeCode) {
+function renderHtml(route, js, css, contextData, langeCode) {
   const source = renderToString(
     <AppProvider value={JSON.parse(contextData)}>
       <ServerHtml
+        route={route}
         js={js}
         css={css}
         appContext={`var eContext = ${contextData}`}

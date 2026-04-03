@@ -203,7 +203,7 @@ interface Customer {
     value: string;
     text: string;
   };
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface CustomerState {
@@ -246,8 +246,11 @@ interface CustomerContextValue extends CustomerState {}
 
 interface CustomerDispatchContextValue {
   login: (
-    email: string,
-    password: string,
+    data: {
+      email: string;
+      password: string;
+      [key: string]: unknown;
+    },
     redirectUrl: string
   ) => Promise<boolean>;
   register: (
@@ -255,6 +258,7 @@ interface CustomerDispatchContextValue {
       full_name: string;
       email: string;
       password: string;
+      [key: string]: unknown;
     },
     loginIfSuccess: boolean,
     redirectUrl: string
@@ -337,8 +341,11 @@ export function CustomerProvider({
   // Login function
   const login = useCallback(
     async (
-      email: string,
-      password: string,
+      data: {
+        email: string;
+        password: string;
+        [key: string]: unknown;
+      },
       redirectUrl: string
     ): Promise<boolean> => {
       dispatch({ type: 'SET_LOADING', payload: true });
@@ -348,7 +355,7 @@ export function CustomerProvider({
           fetch(loginAPI, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify(data)
           })
         );
 
@@ -378,6 +385,7 @@ export function CustomerProvider({
         full_name: string;
         email: string;
         password: string;
+        [key: string]: unknown;
       },
       loginIfSuccess: boolean,
       redirectUrl: string
@@ -406,7 +414,10 @@ export function CustomerProvider({
         await appDispatch.fetchPageData(getCurrentAjaxUrl());
         if (loginIfSuccess) {
           // Auto login after successful registration
-          await login(data.email, data.password, redirectUrl);
+          await login(
+            { email: data.email, password: data.password },
+            redirectUrl
+          );
         }
         return true;
       } catch (error) {
@@ -414,7 +425,7 @@ export function CustomerProvider({
         throw error;
       }
     },
-    [registerAPI, appDispatch, getCurrentAjaxUrl]
+    [registerAPI, appDispatch, getCurrentAjaxUrl, login]
   );
 
   // Logout function

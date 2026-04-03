@@ -1,4 +1,13 @@
 import { useAppDispatch } from '@components/common/context/app.js';
+import {
+  Pagination as PaginationUI,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious
+} from '@components/common/ui/Pagination.js';
 import React, { useState, useEffect, useCallback } from 'react';
 
 export interface PaginationProps {
@@ -289,85 +298,116 @@ export const DefaultPaginationRenderer: React.FC<{
     getDisplayText
   } = renderProps;
 
+  const pageNumbers = getPageNumbers(7);
+  const showStartEllipsis = pageNumbers[0] > 1;
+  const showEndEllipsis = pageNumbers[pageNumbers.length - 1] < totalPages;
+
   return (
     <div className={`products-pagination ${className}`}>
       {showInfo && (
-        <div className="pagination-info text-center text-gray-600 mb-4">
+        <div className="pagination-info text-center text-muted-foreground mb-4">
           {getDisplayText()}
         </div>
       )}
 
-      <ul className="pagination flex justify-center space-x-3">
-        {hasPrev && (
-          <li className="page-item prev self-center">
-            <button
-              type="button"
-              className="link-button page-link flex justify-center items-center"
-              onClick={goToPrev}
-              disabled={isLoading}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </li>
-        )}
+      <PaginationUI>
+        <PaginationContent>
+          {hasPrev && (
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!isLoading) goToPrev();
+                }}
+                aria-disabled={isLoading}
+                className={isLoading ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+          )}
 
-        {getPageNumbers().map((p) => (
-          <li
-            key={p}
-            className={`page-item self-center ${
-              isCurrentPage(p) ? 'current' : ''
-            }`}
-          >
-            <button
-              type="button"
-              className="link-button page-link flex justify-center items-center"
-              onClick={() => goToPage(p)}
-              disabled={isLoading || isCurrentPage(p)}
-            >
-              {isCurrentPage(p) ? <strong>{p}</strong> : p}
-            </button>
-          </li>
-        ))}
+          {showStartEllipsis && (
+            <>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!isLoading) goToPage(1);
+                  }}
+                  aria-disabled={isLoading}
+                  className={isLoading ? 'pointer-events-none opacity-50' : ''}
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            </>
+          )}
 
-        {hasNext && (
-          <li className="page-item next self-center">
-            <button
-              type="button"
-              className="page-link link-button flex justify-center items-center"
-              onClick={goToNext}
-              disabled={isLoading}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+          {pageNumbers.map((p) => (
+            <PaginationItem key={p}>
+              <PaginationLink
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!isLoading && !isCurrentPage(p)) goToPage(p);
+                }}
+                isActive={isCurrentPage(p)}
+                aria-disabled={isLoading || isCurrentPage(p)}
+                className={
+                  isLoading || isCurrentPage(p)
+                    ? 'pointer-events-none opacity-50'
+                    : ''
+                }
               >
-                <path
-                  fillRule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </li>
-        )}
-      </ul>
+                {p}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          {showEndEllipsis && (
+            <>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!isLoading) goToPage(totalPages);
+                  }}
+                  aria-disabled={isLoading}
+                  className={isLoading ? 'pointer-events-none opacity-50' : ''}
+                >
+                  {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+            </>
+          )}
+
+          {hasNext && (
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!isLoading) goToNext();
+                }}
+                aria-disabled={isLoading}
+                className={isLoading ? 'pointer-events-none opacity-50' : ''}
+              />
+            </PaginationItem>
+          )}
+        </PaginationContent>
+      </PaginationUI>
 
       {isLoading && (
         <div className="pagination-loading text-center mt-2">
-          <div className="inline-block w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
     </div>

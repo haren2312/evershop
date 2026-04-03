@@ -1,6 +1,12 @@
-import { Card } from '@components/admin/Card.js';
 import { InputField } from '@components/common/form/InputField.js';
 import { TextareaField } from '@components/common/form/TextareaField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface CmsPageSeoProps {
@@ -14,9 +20,15 @@ interface CmsPageSeoProps {
 
 export default function Seo({ page }: CmsPageSeoProps) {
   return (
-    <Card title="Search Engine Optimization">
-      <Card.Session>
-        <div className="space-y-2">
+    <Card>
+      <CardHeader>
+        <CardTitle>SEO Information</CardTitle>
+        <CardDescription>
+          Provide the SEO details for the CMS page.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
           <InputField
             id="urlKey"
             name="url_key"
@@ -46,7 +58,7 @@ export default function Seo({ page }: CmsPageSeoProps) {
             defaultValue={page?.metaDescription}
           />
         </div>
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

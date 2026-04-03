@@ -1,5 +1,12 @@
-import { Card } from '@components/admin/Card.js';
 import { Image } from '@components/admin/ImageUploader.js';
+import { CardContent } from '@components/common/ui/Card.js';
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@components/common/ui/Table.js';
 import React from 'react';
 import { useQuery } from 'urql';
 import { VariantGroup } from '../VariantGroup.js';
@@ -138,27 +145,29 @@ export const Variants: React.FC<VariantsProps> = ({
   }
 
   if (error) {
-    return <p className="text-critical">{error.message}</p>;
+    return <p className="text-destructive">{error.message}</p>;
   }
 
   return (
-    <Card.Session>
+    <CardContent>
       <div className="variant-list overflow-x-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Image</th>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Image</TableHead>
               {variantGroup.attributes.map((attribute) => (
-                <th key={attribute.attributeId}>{attribute.attributeName}</th>
+                <TableHead key={attribute.attributeId}>
+                  {attribute.attributeName}
+                </TableHead>
               ))}
-              <th>SKU</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+              <TableHead>Sku</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {(data.product.variantGroup?.items || [])
               .filter((v) => v.product.productId !== productId)
               .map((v) => (
@@ -169,8 +178,8 @@ export const Variants: React.FC<VariantsProps> = ({
                   variantGroup={variantGroup}
                 />
               ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
       <div className="self-center">
         <CreateVariant
@@ -179,6 +188,6 @@ export const Variants: React.FC<VariantsProps> = ({
           refresh={refresh}
         />
       </div>
-    </Card.Session>
+    </CardContent>
   );
 };

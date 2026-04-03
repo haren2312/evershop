@@ -1,12 +1,15 @@
 import { Tooltip } from '@components/common/form/Tooltip.js';
 import { getNestedError } from '@components/common/form/utils/getNestedError.js';
+import { Field, FieldError, FieldLabel } from '@components/common/ui/Field.js';
+import { Textarea } from '@components/common/ui/Textarea.js';
 import { _ } from '@evershop/evershop/lib/locale/translate/_';
 import React from 'react';
 import {
   useFormContext,
   RegisterOptions,
   FieldPath,
-  FieldValues
+  FieldValues,
+  Controller
 } from 'react-hook-form';
 
 interface TextareaFieldProps<T extends FieldValues = FieldValues>
@@ -30,10 +33,11 @@ export function TextareaField<T extends FieldValues = FieldValues>({
   validation,
   className,
   rows = 4,
+  defaultValue,
   ...props
 }: TextareaFieldProps<T>) {
   const {
-    register,
+    control,
     formState: { errors }
   } = useFormContext<T>();
 
@@ -49,34 +53,43 @@ export function TextareaField<T extends FieldValues = FieldValues>({
   };
 
   return (
-    <div className={`form-field ${wrapperClassName}`}>
+    <Field
+      data-invalid={fieldError ? 'true' : 'false'}
+      className={wrapperClassName}
+    >
       {label && (
-        <label htmlFor={fieldId}>
-          {label}
-          {required && <span className="required-indicator">*</span>}
-          {helperText && <Tooltip content={helperText} position="top" />}
-        </label>
+        <FieldLabel htmlFor={fieldId}>
+          <>
+            {label}
+            {required && <span className="text-destructive">*</span>}
+            {helperText && <Tooltip content={helperText} position="top" />}
+          </>
+        </FieldLabel>
       )}
 
-      <textarea
-        id={fieldId}
-        rows={rows}
-        {...register(name, validationRules)}
-        className={`${fieldError !== undefined ? 'error' : ''} ${
-          className || ''
-        }`}
-        aria-invalid={fieldError !== undefined ? 'true' : 'false'}
-        aria-describedby={
-          fieldError !== undefined ? `${fieldId}-error` : undefined
-        }
-        {...props}
+      <Controller
+        name={name}
+        control={control}
+        rules={validationRules}
+        defaultValue={defaultValue as any}
+        render={({ field }) => (
+          <Textarea
+            {...field}
+            id={fieldId}
+            rows={rows}
+            className={`${fieldError !== undefined ? 'error' : ''} ${
+              className || ''
+            }`}
+            aria-invalid={fieldError !== undefined ? 'true' : 'false'}
+            aria-describedby={
+              fieldError !== undefined ? `${fieldId}-error` : undefined
+            }
+            {...props}
+          />
+        )}
       />
 
-      {fieldError && (
-        <p id={`${fieldId}-error`} className="field-error">
-          {fieldError}
-        </p>
-      )}
-    </div>
+      {fieldError && <FieldError>{fieldError}</FieldError>}
+    </Field>
   );
 }

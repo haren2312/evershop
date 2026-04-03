@@ -1,6 +1,15 @@
 import { InputField } from '@components/common/form/InputField.js';
 import { NumberField } from '@components/common/form/NumberField.js';
 import { SelectField } from '@components/common/form/SelectField.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@components/common/ui/Table.js';
 import React, { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { options, operators, Operator } from './conditionCriterias.js';
@@ -24,7 +33,9 @@ interface RequiredProducts {
   };
 }
 
-export function RequiredProducts({ requiredProducts }: RequiredProductsProps) {
+export function RequiredProducts({
+  requiredProducts = []
+}: RequiredProductsProps) {
   const { setValue, watch } = useFormContext();
   const { fields, append, remove, replace } = useFieldArray<RequiredProducts>({
     name: 'condition.required_products'
@@ -35,34 +46,33 @@ export function RequiredProducts({ requiredProducts }: RequiredProductsProps) {
   }, []);
 
   const fieldsWatch = watch('condition.required_products');
-
   return (
     <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
       <div>
         <span>Order must contains product matched bellow conditions(All)</span>
       </div>
-      <table className="table table-auto" style={{ marginTop: 0 }}>
-        <thead>
-          <tr>
-            <th>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>
               <span>Key</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>Operator</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>Value</span>
-            </th>
-            <th>
+            </TableHead>
+            <TableHead>
               <span>Minimum quantity</span>
-            </th>
-            <th> </th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHead>
+            <TableHead> </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {fields.map((p, i) => (
-            <tr key={p.id}>
-              <td>
+            <TableRow key={p.id}>
+              <TableCell>
                 {p.editable ? (
                   <SelectField
                     name={`condition.required_products.${i}.key`}
@@ -92,8 +102,8 @@ export function RequiredProducts({ requiredProducts }: RequiredProductsProps) {
                     />
                   </>
                 )}
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 {p.editable ? (
                   <SelectField
                     options={operators.map((operator) => ({
@@ -117,15 +127,16 @@ export function RequiredProducts({ requiredProducts }: RequiredProductsProps) {
                       readOnly
                       name={`condition.required_products.${i}.operatorlabel`}
                       value={
-                        operators.find((c) => c.key === p.operator)?.label ||
-                        'Unknown'
+                        operators.find(
+                          (c) => c.key === fieldsWatch[i]?.operator
+                        )?.label || 'Unknown'
                       }
                       wrapperClassName="form-field mb-0"
                     />
                   </>
                 )}
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 {fieldsWatch[i].key === 'price' && (
                   <NumberField
                     name={`condition.required_products.${i}.value`}
@@ -152,8 +163,8 @@ export function RequiredProducts({ requiredProducts }: RequiredProductsProps) {
                     />
                   </>
                 )}
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <div style={{ width: '80px' }}>
                   <NumberField
                     name={`condition.required_products.${i}.qty`}
@@ -174,11 +185,11 @@ export function RequiredProducts({ requiredProducts }: RequiredProductsProps) {
                     wrapperClassName="form-field mb-0"
                   />
                 </div>
-              </td>
-              <td>
+              </TableCell>
+              <TableCell>
                 <a
                   href="#"
-                  className="text-critical"
+                  className="text-destructive"
                   onClick={(e) => {
                     e.preventDefault();
                     remove(i);
@@ -200,32 +211,15 @@ export function RequiredProducts({ requiredProducts }: RequiredProductsProps) {
                     />
                   </svg>
                 </a>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       <div className="mt-2 flex justify-start">
-        <div className="items-center flex">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="1.5rem"
-            height="1.5rem"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-        </div>
         <div className="pl-2">
-          <a
-            href="#"
+          <Button
+            variant={'outline'}
             onClick={(e) => {
               e.preventDefault();
               append({
@@ -238,13 +232,9 @@ export function RequiredProducts({ requiredProducts }: RequiredProductsProps) {
             }}
           >
             <span>Add product</span>
-          </a>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
-
-RequiredProducts.defaultProps = {
-  requiredProducts: []
-};

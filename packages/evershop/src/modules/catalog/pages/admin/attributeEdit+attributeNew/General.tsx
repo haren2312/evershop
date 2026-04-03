@@ -1,11 +1,26 @@
-import { Card } from '@components/admin/Card.js';
 import Spinner from '@components/admin/Spinner.jsx';
 import { InputField } from '@components/common/form/InputField.js';
 import { RadioGroupField } from '@components/common/form/RadioGroupField.js';
+import { Button } from '@components/common/ui/Button.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
+import { Input } from '@components/common/ui/Input.js';
+import {
+  InputGroupAddon,
+  InputGroupInput
+} from '@components/common/ui/InputGroup.js';
+import { InputGroup } from '@components/common/ui/InputGroup.js';
+import { PlusCircle } from 'lucide-react';
 import React from 'react';
 import { useFormContext, Controller, useFieldArray } from 'react-hook-form';
 import Select from 'react-select';
 import { useQuery } from 'urql';
+import { v4 as uuidv4 } from 'uuid';
 import { get } from '../../../../../lib/util/get.js';
 import './General.scss';
 
@@ -36,6 +51,7 @@ interface Group {
     }[];
   };
 }
+
 const Groups: React.FC<{ groups: Group[]; createGroupApi: string }> = ({
   groups,
   createGroupApi
@@ -81,7 +97,7 @@ const Groups: React.FC<{ groups: Group[]; createGroupApi: string }> = ({
       </div>
     );
   if (error) {
-    return <p className="text-red-500">{error.message}</p>;
+    return <p className="text-destructive">{error.message}</p>;
   }
 
   return (
@@ -114,40 +130,30 @@ const Groups: React.FC<{ groups: Group[]; createGroupApi: string }> = ({
         <div className="grid gap-5 grid-cols-1">
           <div>
             <div className="flex gap-5">
-              <input
-                type="text"
-                placeholder="Create a new group"
-                ref={newGroup}
-                className="flex-1 border border-gray-300 rounded-l-md p-2"
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  createGroup();
-                }}
-                className="px-2 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-              >
-                <svg
-                  width="1.5rem"
-                  height="1.5rem"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </button>
+              <InputGroup className="max-w-xs">
+                <InputGroupInput
+                  type="text"
+                  placeholder="Create a new group"
+                  ref={newGroup}
+                />
+                <InputGroupAddon align="inline-end">
+                  <a
+                    className="flex w-8 items-center justify-center text-primary"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      createGroup();
+                    }}
+                  >
+                    <PlusCircle className="size-4" />
+                  </a>
+                </InputGroupAddon>
+              </InputGroup>
             </div>
             {createGroupError && (
-              <p className="text-red-500 text-xs mt-1">{createGroupError}</p>
+              <p className="text-destructive text-xs mt-1">
+                {createGroupError}
+              </p>
             )}
           </div>
         </div>
@@ -182,7 +188,7 @@ const Options: React.FC<{
       option_id: (
         Math.floor(Math.random() * (9000000 - 1000000)) + 1000000
       ).toString(),
-      uuid: crypto.randomUUID()
+      uuid: uuidv4()
     });
   };
 
@@ -196,37 +202,28 @@ const Options: React.FC<{
                 name={`options.${index}.option_text`}
                 placeholder="Option text"
                 validation={{ required: 'Option text is required' }}
-                wrapperClassName="form-field mb-0"
               />
-              <InputField
-                type="hidden"
-                name={`options.${index}.option_id`}
-                wrapperClassName="form-field mb-0"
-              />
+              <InputField type="hidden" name={`options.${index}.option_id`} />
             </div>
             <div className="self-center">
-              <button
+              <Button
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   remove(index);
                 }}
-                className="text-red-500 hover:underline"
+                variant={'destructive'}
               >
-                Remove option
-              </button>
+                Remove
+              </Button>
             </div>
           </div>
         );
       })}
       <div className="mt-2">
-        <button
-          type="button"
-          onClick={addOption}
-          className="text-blue-500 hover:underline"
-        >
+        <Button type="button" onClick={addOption} variant={'outline'}>
           Add option
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -254,12 +251,17 @@ interface GeneralProps {
 }
 
 export default function General({ attribute, createGroupApi }: GeneralProps) {
-  const { register } = useFormContext();
-  const [type, setType] = React.useState(attribute?.type || 'text');
+  const [type] = React.useState(attribute?.type || 'text');
 
   return (
-    <Card title="General">
-      <Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>General</CardTitle>
+        <CardDescription>
+          Manage the general information of the attribute.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="space-y-2">
           <InputField
             name="attribute_name"
@@ -293,23 +295,24 @@ export default function General({ attribute, createGroupApi }: GeneralProps) {
                 label="Type"
                 defaultValue={attribute?.type}
                 required
+                disabled={!!attribute?.attributeId}
                 validation={{ required: 'Type is required' }}
               />
             </div>
           </div>
         </div>
-      </Card.Session>
+      </CardContent>
       {['select', 'multiselect'].includes(type) && (
-        <Card.Session title="Attribute options">
+        <CardContent title="Attribute options">
           <Options originOptions={get(attribute, 'options', [])} />
-        </Card.Session>
+        </CardContent>
       )}
-      <Card.Session title="Attribute Group">
+      <CardContent title="Attribute Group">
         <Groups
           groups={get(attribute, 'groups.items', [])}
           createGroupApi={createGroupApi}
         />
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

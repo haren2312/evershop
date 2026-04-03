@@ -1,5 +1,5 @@
 import { NavigationItemGroup } from '@components/admin/NavigationItemGroup';
-import { UsersIcon } from '@heroicons/react/24/solid';
+import { User } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -10,7 +10,7 @@ export default function CustomerMenuGroup({ customerGrid }) {
       name="Customer"
       items={[
         {
-          Icon: UsersIcon,
+          Icon: User,
           url: customerGrid,
           title: 'Customers'
         }

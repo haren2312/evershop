@@ -1,9 +1,11 @@
+import { Button } from '@components/common/ui/Button.js';
 import {
   useCheckout,
   useCheckoutDispatch
 } from '@components/frontStore/checkout/CheckoutContext.js';
 import { _ } from '@evershop/evershop/lib/locale/translate/_';
 import React, { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 interface CashOnDeliveryMethodProps {
   setting: {
@@ -45,14 +47,14 @@ export default function CashOnDeliveryMethod({
   useEffect(() => {
     registerPaymentComponent('cod', {
       nameRenderer: () => (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between w-full">
           <span>{setting.codDisplayName}</span>
           <CODLogo />
         </div>
       ),
       formRenderer: () => (
-        <div className="flex justify-center text-gray-500">
-          <div className="w-2/3 text-center p-5">
+        <div className="flex justify-center text-muted-foreground">
+          <div className="w-2/3 text-center py-3">
             {_(
               'Conveniently pay with cash at your doorstep when your order is delivered.'
             )}
@@ -64,17 +66,25 @@ export default function CashOnDeliveryMethod({
         const { loadingStates, orderPlaced } = useCheckout();
         const handleClick = async (e: React.MouseEvent) => {
           e.preventDefault();
-          await checkout();
+          try {
+            await checkout();
+          } catch (error) {
+            toast.error(
+              error.message || _('Failed to place order. Please try again.')
+            );
+          }
         };
 
         const isDisabled = loadingStates.placingOrder || orderPlaced;
 
         return (
-          <button
+          <Button
+            variant={'default'}
+            size={'xl'}
             type="button"
             onClick={handleClick}
             disabled={isDisabled}
-            className="w-full bg-green-600 text-white py-4 px-6 rounded-lg font-semibold text-lg shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-green-600"
+            className="w-full transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-primary"
           >
             <span className="flex items-center justify-center space-x-2">
               {loadingStates.placingOrder ? (
@@ -125,7 +135,7 @@ export default function CashOnDeliveryMethod({
                 </>
               )}
             </span>
-          </button>
+          </Button>
         );
       }
     });
@@ -135,7 +145,7 @@ export default function CashOnDeliveryMethod({
 }
 
 export const layout = {
-  areaId: 'checkoutForm',
+  areaId: 'checkoutFormAfter',
   sortOrder: 10
 };
 

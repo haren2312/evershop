@@ -1,4 +1,4 @@
-import Button from '@components/common/Button.js';
+import { Button } from '@components/common/ui/Button.js';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -11,24 +11,25 @@ const FormButtons: React.FC<{
   } = useFormContext();
 
   return (
-    <div className="form-submit-button flex border-t border-divider mt-4 pt-4 justify-between">
+    <div className="form-submit-button flex border-t border-border mt-4 pt-4 justify-between">
       <Button
-        title="Cancel"
-        variant="danger"
-        outline
-        onAction={() => {
+        variant="destructive"
+        onClick={() => {
           window.location.href = cancelUrl;
         }}
-      />
+      >
+        Cancel
+      </Button>
       <Button
-        title="Save"
-        onAction={() => {
+        onClick={() => {
           (document.getElementById(formId) as HTMLFormElement).dispatchEvent(
             new Event('submit', { cancelable: true, bubbles: true })
           );
         }}
         isLoading={isSubmitting}
-      />
+      >
+        Save
+      </Button>
     </div>
   );
 };

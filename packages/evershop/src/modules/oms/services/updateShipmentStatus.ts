@@ -9,14 +9,14 @@ import {
 import { error } from '../../../lib/log/logger.js';
 import { pool } from '../../../lib/postgres/connection.js';
 import { getConfig } from '../../../lib/util/getConfig.js';
-import { hookable } from '../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../lib/util/hookable.js';
 import { ShipmentStatus } from '../../../types/order.js';
 
 function validateShipmentStatusBeforeUpdate(status: string): boolean {
   const shipmentStatusList = getConfig(
     'oms.order.shipmentStatus',
     {}
-  ) as ShipmentStatus;
+  ) as Record<string, ShipmentStatus>;
   if (!shipmentStatusList[status]) {
     throw new Error('Invalid status');
   }
@@ -63,3 +63,55 @@ export const updateShipmentStatus = async (
     throw err;
   }
 };
+
+export function hookBeforeValidateShipmentStatusBeforeUpdate(
+  callback: (
+    this: { orderId: number },
+    ...args: [
+    status: string
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('validateShipmentStatusBeforeUpdate', callback, priority);
+}
+
+export function hookAfterValidateShipmentStatusBeforeUpdate(
+  callback: (
+    this: { orderId: number },
+    ...args: [
+    status: string
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('validateShipmentStatusBeforeUpdate', callback, priority);
+}
+
+export function hookBeforeChangeShipmentStatus(
+  callback: (
+    this: { orderId: number; status: string },
+    ...args: [
+    orderId: number,
+    status: string,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('changeShipmentStatus', callback, priority);
+}
+
+export function hookAfterChangeShipmentStatus(
+  callback: (
+    this: { orderId: number; status: string },
+    ...args: [
+    orderId: number,
+    status: string,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('changeShipmentStatus', callback, priority);
+}

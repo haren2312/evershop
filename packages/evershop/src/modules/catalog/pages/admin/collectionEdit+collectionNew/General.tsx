@@ -1,7 +1,13 @@
-import { Card } from '@components/admin/Card.js';
 import Area from '@components/common/Area.js';
 import { Editor, Row } from '@components/common/form/Editor.js';
 import { InputField } from '@components/common/form/InputField.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import './General.scss';
 import React from 'react';
 
@@ -38,6 +44,7 @@ export default function General({ collection }: GeneralProps) {
             name="code"
             label="Collection Code"
             defaultValue={collection?.code || ''}
+            required
             validation={{
               required: 'Collection code is required',
               pattern: {
@@ -69,9 +76,19 @@ export default function General({ collection }: GeneralProps) {
 
   return (
     <Card title="General">
-      <Card.Session>
-        <Area id="collectionEditGeneral" coreComponents={fields} />
-      </Card.Session>
+      <CardHeader>
+        <CardTitle>General Information</CardTitle>
+        <CardDescription>
+          Manage general information about the collection.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Area
+          id="collectionEditGeneral"
+          coreComponents={fields}
+          className="space-y-2"
+        />
+      </CardContent>
     </Card>
   );
 }

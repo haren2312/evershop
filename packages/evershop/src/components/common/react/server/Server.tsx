@@ -1,13 +1,18 @@
 import Area from '@components/common/Area.js';
 import { Alert } from '@components/common/modal/Alert.js';
 import React from 'react';
+import { Route } from '../../../../types/route.js';
 
 interface ServerHtmlProps {
+  route: Route;
   css: string[];
   js: string[];
   appContext: string;
 }
-function ServerHtml({ css, js, appContext }: ServerHtmlProps) {
+function ServerHtml({ route, css, js, appContext }: ServerHtmlProps) {
+  const classes = route.isAdmin
+    ? `admin ${route.id}`
+    : `frontStore ${route.id}`;
   return (
     <>
       <head>
@@ -18,8 +23,8 @@ function ServerHtml({ css, js, appContext }: ServerHtmlProps) {
         ))}
         <Area noOuter id="head" />
       </head>
-      <body id="body">
-        <div id="app" className="bg-background">
+      <body id="body" className={classes}>
+        <div id="app">
           <Alert>
             <Area id="body" className="wrapper" />
           </Alert>

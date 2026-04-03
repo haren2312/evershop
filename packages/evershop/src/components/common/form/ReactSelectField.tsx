@@ -1,4 +1,8 @@
+import { Tooltip } from '@components/common/form/Tooltip.js';
+import { getNestedError } from '@components/common/form/utils/getNestedError.js';
+import { Field, FieldError, FieldLabel } from '@components/common/ui/Field.js';
 import { _ } from '@evershop/evershop/lib/locale/translate/_';
+import { cn } from '@evershop/evershop/lib/util/cn';
 import React from 'react';
 import {
   Controller,
@@ -43,7 +47,11 @@ export function ReactSelectField<T extends FieldValues = FieldValues>({
   defaultValue,
   ...selectProps
 }: ReactSelectFieldProps<T>) {
-  const { control } = useFormContext<T>();
+  const {
+    control,
+    formState: { errors }
+  } = useFormContext<T>();
+  const fieldError = getNestedError(name, errors, error);
   const fieldId = `field-${name}`;
 
   const validationRules = {
@@ -55,12 +63,19 @@ export function ReactSelectField<T extends FieldValues = FieldValues>({
   };
 
   return (
-    <div className={`${wrapperClassName} ${className || ''}`}>
+    <Field
+      data-invalid={fieldError ? 'true' : 'false'}
+      className={wrapperClassName}
+      id={`field-${name}`}
+    >
       {label && (
-        <label htmlFor={fieldId}>
-          {label}
-          {required && <span className="required-indicator">*</span>}
-        </label>
+        <FieldLabel htmlFor={fieldId}>
+          <>
+            {label}
+            {required && <span className="text-destructive">*</span>}
+            {helperText && <Tooltip content={helperText} position="top" />}
+          </>
+        </FieldLabel>
       )}
 
       <Controller
@@ -68,86 +83,63 @@ export function ReactSelectField<T extends FieldValues = FieldValues>({
         control={control}
         rules={validationRules}
         defaultValue={defaultValue}
-        render={({ field, fieldState }) => {
-          const fieldError = error || fieldState.error?.message;
-          return (
-            <div className={fieldError !== undefined ? 'error' : ''}>
-              <Select
-                {...field}
-                {...selectProps}
-                inputId={fieldId}
-                options={options}
-                isMulti={isMulti}
-                value={
-                  isMulti
-                    ? options.filter((option) =>
-                        (field.value || defaultValue || [])?.includes(
-                          option.value
-                        )
-                      )
-                    : options.find(
-                        (option) =>
-                          option.value === (field.value ?? defaultValue)
-                      ) || null
-                }
-                onChange={(selectedOption) => {
-                  if (isMulti) {
-                    const values = selectedOption
-                      ? (selectedOption as SelectOption[]).map(
-                          (option) => option.value
-                        )
-                      : [];
-                    field.onChange(values);
-                  } else {
-                    field.onChange(
-                      selectedOption
-                        ? (selectedOption as SelectOption).value
-                        : null
-                    );
-                  }
-                }}
-                classNamePrefix="react-select"
-                styles={{
-                  control: (base, state) => ({
-                    ...base,
-                    minHeight: 'auto',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '0.375rem',
-                    boxShadow: 'none',
-                    transition: 'border-color 0.15s ease-in-out',
-                    '&:hover': {
-                      borderColor: '#d1d5db'
-                    },
-                    ...(state.isFocused && {
-                      borderColor: '#3b82f6',
-                      boxShadow: '0 0 0 1px rgb(59, 130, 246)'
-                    })
-                  }),
-                  input: (base) => ({
-                    ...base,
-                    '& input': {
-                      boxShadow: 'none !important',
-                      outline: 'none !important'
-                    }
-                  })
-                }}
-              />
-
-              {fieldError && (
-                <p id={`${fieldId}-error`} className="field-error">
-                  {fieldError}
-                </p>
-              )}
-
-              {helperText && !fieldError && (
-                <p id={`${fieldId}-helper`} className="field-helper">
-                  {helperText}
-                </p>
-              )}
-            </div>
-          );
-        }}
+        render={({ field }) => (
+          <Select
+            {...field}
+            {...selectProps}
+            inputId={fieldId}
+            options={options}
+            isMulti={isMulti}
+            className={cn(className)}
+            value={
+              isMulti
+                ? options.filter((option) =>
+                    (field.value || defaultValue || [])?.includes(option.value)
+                  )
+                : options.find(
+                    (option) => option.value === (field.value ?? defaultValue)
+                  ) || null
+            }
+            onChange={(selectedOption) => {
+              if (isMulti) {
+                const values = selectedOption
+                  ? (selectedOption as SelectOption[]).map(
+                      (option) => option.value
+                    )
+                  : [];
+                field.onChange(values);
+              } else {
+                field.onChange(
+                  selectedOption ? (selectedOption as SelectOption).value : null
+                );
+              }
+            }}
+            classNamePrefix="react-select"
+            aria-invalid={fieldError !== undefined ? 'true' : 'false'}
+            aria-describedby={
+              fieldError !== undefined ? `${fieldId}-error` : undefined
+            }
+            classNames={{
+              control: (state) =>
+                cn(
+                  'min-h-auto border border-input rounded-md shadow-xs transition-[color,box-shadow]',
+                  state.isFocused && 'border-ring ring-[3px] ring-ring/50',
+                  fieldError &&
+                    'border-destructive ring-[3px] ring-destructive/20'
+                ),
+              input: () => 'outline-none shadow-none',
+              menu: () => 'bg-popover border border-input rounded-md shadow-md',
+              option: (state) =>
+                cn(
+                  'px-3 py-2 cursor-pointer',
+                  state.isSelected && 'bg-primary text-primary-foreground',
+                  state.isFocused && !state.isSelected && 'bg-accent'
+                )
+            }}
+          />
+        )}
       />
-    </div>
+      {fieldError && <FieldError>{fieldError}</FieldError>}
+    </Field>
   );
 }

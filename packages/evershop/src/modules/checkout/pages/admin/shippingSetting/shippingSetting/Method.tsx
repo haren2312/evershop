@@ -1,6 +1,10 @@
-import { Modal } from '@components/common/modal/Modal.js';
-import { useModal } from '@components/common/modal/useModal.js';
-import { CogIcon } from '@heroicons/react/24/outline';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from '@components/common/ui/Dialog.js';
+import { Cog } from 'lucide-react';
 import React from 'react';
 import { toast } from 'react-toastify';
 import { MethodForm } from './MethodForm.js';
@@ -35,25 +39,29 @@ export interface MethodProps {
 }
 
 function Method({ method, reload }: MethodProps) {
-  const modal = useModal();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   return (
-    <>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <>
         <td className="border-none py-2">{method.name}</td>
         <td className="border-none py-2">
-          {method.isEnabled ? 'Enabled' : 'Disabled'}
+          {method.isEnabled ? (
+            <span className="text-green-700">Enabled</span>
+          ) : (
+            <span className="text-destructive">Disabled</span>
+          )}
         </td>
         <td className="border-none py-2">
           {method.cost?.text || (
             <a
               href="#"
-              className="text-interactive"
+              className="text-primary"
               onClick={(e) => {
                 e.preventDefault();
-                modal.open();
+                setDialogOpen(true);
               }}
             >
-              <CogIcon width={22} height={22} />
+              <Cog width={22} height={22} />
             </a>
           )}
         </td>
@@ -67,17 +75,17 @@ function Method({ method, reload }: MethodProps) {
         <td className="border-none py-2">
           <a
             href="#"
-            className="text-interactive"
+            className="text-primary"
             onClick={(e) => {
               e.preventDefault();
-              modal.open();
+              setDialogOpen(true);
             }}
           >
             Edit
           </a>
           <a
             href="#"
-            className="text-critical ml-5"
+            className="text-destructive ml-5"
             onClick={async (e) => {
               e.preventDefault();
               try {
@@ -106,19 +114,18 @@ function Method({ method, reload }: MethodProps) {
           </a>
         </td>
       </>
-      <Modal
-        title={`Edit ${method.name} Method`}
-        onClose={modal.close}
-        isOpen={modal.isOpen}
-      >
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Shipping Method</DialogTitle>
+        </DialogHeader>
         <MethodForm
           saveMethodApi={method.updateApi}
-          onSuccess={() => modal.close()}
+          onSuccess={() => setDialogOpen(false)}
           reload={reload}
           method={method}
         />
-      </Modal>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }
 

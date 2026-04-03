@@ -1,6 +1,10 @@
-import { Card } from '@components/admin/Card.js';
 import { SettingMenu } from '@components/admin/SettingMenu.js';
-import Button from '@components/common/Button.js';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 import { Zones } from './shippingSetting/Zones.js';
 
@@ -17,11 +21,12 @@ export default function ShippingSetting({
         </div>
         <div className="col-span-4">
           <Card>
-            <Card.Session title="Shipping">
-              <div>
+            <CardHeader>
+              <CardTitle>Shipping</CardTitle>
+              <CardDescription>
                 Choose where you ship and how much you charge for shipping.
-              </div>
-            </Card.Session>
+              </CardDescription>
+            </CardHeader>
             <Zones createShippingZoneApi={createShippingZoneApi} />
           </Card>
         </div>

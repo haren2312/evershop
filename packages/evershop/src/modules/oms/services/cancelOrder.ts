@@ -2,7 +2,6 @@ import {
   commit,
   execute,
   getConnection,
-  insert,
   PoolClient,
   rollback,
   select,
@@ -11,8 +10,9 @@ import {
 import { error } from '../../../lib/log/logger.js';
 import { pool } from '../../../lib/postgres/connection.js';
 import { getConfig } from '../../../lib/util/getConfig.js';
-import { hookable } from '../../../lib/util/hookable.js';
+import { hookable, hookBefore, hookAfter } from '../../../lib/util/hookable.js';
 import { PaymentStatus, ShipmentStatus } from '../../../types/order.js';
+import addOrderActivityLog from './addOrderActivityLog.js';
 import { updatePaymentStatus } from './updatePaymentStatus.js';
 import { updateShipmentStatus } from './updateShipmentStatus.js';
 
@@ -20,12 +20,11 @@ function validateStatus(paymentStatus: string, shipmentStatus: string) {
   const shipmentStatusList = getConfig(
     'oms.order.shipmentStatus',
     {}
-  ) as ShipmentStatus[];
-  const paymentStatusList = getConfig(
-    'oms.order.paymentStatus',
-    {}
-  ) as PaymentStatus[];
-
+  ) as Record<string, ShipmentStatus>;
+  const paymentStatusList = getConfig('oms.order.paymentStatus', {}) as Record<
+    string,
+    PaymentStatus
+  >;
   const paymentStatusConfig = paymentStatusList[paymentStatus];
   const shipmentStatusConfig = shipmentStatusList[shipmentStatus];
   if (
@@ -68,20 +67,6 @@ async function reStockAfterCancel(orderID: number, connection: PoolClient) {
   );
 }
 
-async function addCancellationActivity(
-  orderID: number,
-  reason: string | undefined,
-  connection: PoolClient
-): Promise<void> {
-  await insert('order_activity')
-    .given({
-      order_activity_order_id: orderID,
-      comment: `Order canceled ${reason ? `(${reason})` : ''}`,
-      customer_notified: 0 // TODO: check config of SendGrid
-    })
-    .execute(connection, false);
-}
-
 async function cancelOrder(uuid: string, reason: string | undefined) {
   const connection = await getConnection(pool);
   try {
@@ -111,9 +96,10 @@ async function cancelOrder(uuid: string, reason: string | undefined) {
       order.order_id,
       connection
     );
-    await hookable(addCancellationActivity, { order })(
+    await addOrderActivityLog(
       order.order_id,
-      reason,
+      `Order canceled ${reason ? `(${reason})` : ''}`,
+      false,
       connection
     );
     await hookable(reStockAfterCancel, { order })(order.order_id, connection);
@@ -134,3 +120,133 @@ async function cancelOrder(uuid: string, reason: string | undefined) {
 export default async (uuid: string, reason: string | undefined) => {
   await hookable(cancelOrder, { uuid })(uuid, reason);
 };
+
+export function hookBeforeValidateStatus(
+  callback: (
+    this: { order: Record<string, any> },
+    ...args: [
+    paymentStatus: string,
+    shipmentStatus: string
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('validateStatus', callback, priority);
+}
+
+export function hookAfterValidateStatus(
+  callback: (
+    this: { order: Record<string, any> },
+    ...args: [
+    paymentStatus: string,
+    shipmentStatus: string
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('validateStatus', callback, priority);
+}
+
+export function hookBeforeUpdatePaymentStatusToCancel(
+  callback: (
+    this: { order: Record<string, any> },
+    ...args: [
+    orderID: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updatePaymentStatusToCancel', callback, priority);
+}
+
+export function hookAfterUpdatePaymentStatusToCancel(
+  callback: (
+    this: { order: Record<string, any> },
+    ...args: [
+    orderID: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updatePaymentStatusToCancel', callback, priority);
+}
+
+export function hookBeforeUpdateShipmentStatusToCancel(
+  callback: (
+    this: { order: Record<string, any> },
+    ...args: [
+    orderID: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('updateShipmentStatusToCancel', callback, priority);
+}
+
+export function hookAfterUpdateShipmentStatusToCancel(
+  callback: (
+    this: { order: Record<string, any> },
+    ...args: [
+    orderID: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('updateShipmentStatusToCancel', callback, priority);
+}
+
+export function hookBeforeReStockAfterCancel(
+  callback: (
+    this: { order: Record<string, any> },
+    ...args: [
+    orderID: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('reStockAfterCancel', callback, priority);
+}
+
+export function hookAfterReStockAfterCancel(
+  callback: (
+    this: { order: Record<string, any> },
+    ...args: [
+    orderID: number,
+    connection: PoolClient
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('reStockAfterCancel', callback, priority);
+}
+
+export function hookBeforeCancelOrder(
+  callback: (
+    this: { uuid: string },
+    ...args: [
+    uuid: string,
+    reason: string | undefined
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookBefore('cancelOrder', callback, priority);
+}
+
+export function hookAfterCancelOrder(
+  callback: (
+    this: { uuid: string },
+    ...args: [
+    uuid: string,
+    reason: string | undefined
+    ]
+  ) => void | Promise<void>,
+  priority: number = 10
+): void {
+  hookAfter('cancelOrder', callback, priority);
+}

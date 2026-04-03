@@ -1,5 +1,11 @@
-import { Card } from '@components/admin/Card.js';
 import Area from '@components/common/Area.js';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface SettingProps {
@@ -12,10 +18,16 @@ interface SettingProps {
 export default function Setting({ type }: SettingProps) {
   const areaId = `widget_setting_form`;
   return (
-    <Card title={`${type.name} widget setting`}>
-      <Card.Session>
+    <Card>
+      <CardHeader>
+        <CardTitle>Widget Settings</CardTitle>
+        <CardDescription>
+          Configure the settings for the {type.name} widget.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <Area id={areaId} noOurter />
-      </Card.Session>
+      </CardContent>
     </Card>
   );
 }

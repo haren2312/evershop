@@ -1,5 +1,12 @@
-import { Card } from '@components/admin/Card.js';
 import { RadioGroupField } from '@components/common/form/RadioGroupField.js';
+import {
+  Card,
+  CardHeader,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  CardTitle
+} from '@components/common/ui/Card.js';
 import React from 'react';
 
 interface StatusProps {
@@ -12,8 +19,14 @@ interface StatusProps {
 }
 export default function Status({ product }: StatusProps) {
   return (
-    <Card title="Product status" subdued>
-      <Card.Session>
+    <Card className="bg-popover">
+      <CardHeader>
+        <CardTitle>Product Status</CardTitle>
+        <CardDescription>
+          Set the status and visibility of the product.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         <RadioGroupField
           name="status"
           label="Status"
@@ -25,8 +38,8 @@ export default function Status({ product }: StatusProps) {
           required
           helperText="Disabled products will not be visible in the store and cannot be purchased."
         />
-      </Card.Session>
-      <Card.Session>
+      </CardContent>
+      <CardContent className="border-t border-t-border pt-6">
         <RadioGroupField
           name="visibility"
           label="Visibility"
@@ -38,7 +51,8 @@ export default function Status({ product }: StatusProps) {
           required
           helperText="Visibility determines where the product appears in the store. It does not affect the saleability of the product."
         />
-      </Card.Session>
+      </CardContent>
+      <CardFooter></CardFooter>
     </Card>
   );
 }
